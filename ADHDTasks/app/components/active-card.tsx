@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import { useStartTask } from "../hooks/useStartTask";
+import { CountdownCircleTimer } from "react-native-countdown-circle-timer";
 
 type ActiveCardProps = {
   task: string;
@@ -15,14 +15,20 @@ export default function ActiveCard({
   onAddToInactive,
   onRunningChange,
 }: ActiveCardProps) {
-  const { isRunning, isPaused, onStart, onPause, onComplete, remainingSeconds } =
-    useStartTask(
-    durationMinutes * 60
-    );
+  const durationSeconds = useMemo(() => durationMinutes * 60, [durationMinutes]);
+  const [isRunning, setIsRunning] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [remainingSeconds, setRemainingSeconds] = useState(durationSeconds);
+  const [timerKey, setTimerKey] = useState(0);
 
   useEffect(() => {
     onRunningChange?.(isRunning);
   }, [isRunning, onRunningChange]);
+
+  useEffect(() => {
+    setRemainingSeconds(durationSeconds);
+    setTimerKey((current) => current + 1);
+  }, [durationSeconds]);
 
   const formatTime = (totalSeconds: number) => {
     const minutes = Math.floor(totalSeconds / 60);
@@ -31,6 +37,26 @@ export default function ActiveCard({
       2,
       "0"
     )}`;
+  };
+
+  const onStart = () => {
+    if (remainingSeconds === 0) {
+      setRemainingSeconds(durationSeconds);
+      setTimerKey((current) => current + 1);
+    }
+    setIsRunning(true);
+    setIsPaused(false);
+  };
+
+  const onPause = () => {
+    setIsRunning(false);
+    setIsPaused(true);
+  };
+
+  const onComplete = () => {
+    setIsRunning(false);
+    setIsPaused(false);
+    setRemainingSeconds(0);
   };
 
   const onSkip = () => {
@@ -46,6 +72,31 @@ export default function ActiveCard({
       <Text style={styles.taskLabel}>Right now</Text>
 
       <Text style={styles.taskText}>{task}</Text>
+
+      {isRunning && (
+        <View style={styles.timerWrapper}>
+          <CountdownCircleTimer
+            key={timerKey}
+            isPlaying={!isPaused}
+            duration={durationSeconds}
+            initialRemainingTime={remainingSeconds}
+            colors={["#111", "#666", "#A30000"]}
+            colorsTime={[durationSeconds, Math.max(2, durationSeconds * 0.3), 0]}
+            strokeWidth={10}
+            size={180}
+            updateInterval={1}
+            onUpdate={(remainingTime) => setRemainingSeconds(remainingTime)}
+            onComplete={() => {
+              onComplete();
+              return { shouldRepeat: false };
+            }}
+          >
+            {({ remainingTime }) => (
+              <Text style={styles.timerText}>{formatTime(remainingTime)}</Text>
+            )}
+          </CountdownCircleTimer>
+        </View>
+      )}
 
       <Pressable style={styles.primaryButton} onPress={onStart}>
         <Text style={styles.primaryButtonText}>
@@ -99,6 +150,15 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 6 },
     elevation: 3,
     //margin: 24,
+  },
+  timerWrapper: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  timerText: {
+    fontSize: 22,
+    color: "#111",
+    fontWeight: "600",
   },
   cardFullScreen: {
     flex: 1,
