@@ -49,7 +49,6 @@ export default function ActiveCard({
   };
 
   const onPause = () => {
-    setIsRunning(false);
     setIsPaused(true);
   };
 
@@ -98,13 +97,13 @@ export default function ActiveCard({
         </View>
       )}
 
-      <Pressable style={styles.primaryButton} onPress={onStart}>
-        <Text style={styles.primaryButtonText}>
-          {isRunning
-            ? `Time left ${formatTime(remainingSeconds)}`
-            : `Start ${durationMinutes} minutes`}
-        </Text>
-      </Pressable>
+      {(!isRunning || isPaused) && (
+        <Pressable style={styles.primaryButton} onPress={onStart}>
+          <Text style={styles.primaryButtonText}>
+            {isPaused ? "Resume" : `Start ${durationMinutes} minutes`}
+          </Text>
+        </Pressable>
+      )}
 
 
 
@@ -127,11 +126,9 @@ export default function ActiveCard({
         </Pressable>
       </View>
 
-      <Text style={styles.reassurance}>Starting is enough.</Text>
+      <Text style={styles.reassurance}>Focus!!!</Text>
 
-      <Pressable onPress={onSkip}>
-        <Text style={styles.skipText}>Not now</Text>
-      </Pressable>
+
 
 
 
