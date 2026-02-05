@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "ADHDTasks",
-    "slug": "ADHDTasks",
+    "slug": "adhd-task-organisation",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.detouradmin.ADHDTasks"
+      "bundleIdentifier": "com.adhdtasks.app"
     },
     "android": {
       "adaptiveIcon": {
@@ -44,6 +44,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "d772d567-53f7-452a-8450-17149ae3e20a"
+      }
+    },
+    "owner": "adhdtasks-organisation"
   }
 }
