@@ -8,11 +8,13 @@ import { addTask, getTasks, removeTask, TaskItem } from "../data/tasks";
 export default function HomeScreen() {
   const [inactiveTasks, setInactiveTasks] = useState<TaskItem[]>([]);
   const [isActiveRunning, setIsActiveRunning] = useState(false);
-
-  const activeTask = {
+  const [activeTask, setActiveTask] = useState<{
+    task: string;
+    durationMinutes: number;
+  }>({
     task: "Reply to council email",
     durationMinutes: 10,
-  };
+  });
 
   const loadTasks = useCallback(async () => {
     const tasks = await getTasks();
@@ -50,6 +52,32 @@ export default function HomeScreen() {
     ]);
   };
 
+  const activateInactiveTask = async (task: TaskItem) => {
+    setActiveTask({ task: task.name, durationMinutes: task.durationMinutes });
+    await removeTask(task.id);
+    loadTasks();
+  };
+
+  const handleActivateInactive = (task: TaskItem) => {
+    if (activeTask && activeTask.task !== task.name) {
+      Alert.alert(
+        "Replace active task?",
+        "You already have an active task. Replace it with this one?",
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Replace",
+            style: "destructive",
+            onPress: () => activateInactiveTask(task),
+          },
+        ]
+      );
+      return;
+    }
+
+    activateInactiveTask(task);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -75,6 +103,7 @@ export default function HomeScreen() {
                 task={item.name}
                 durationMinutes={item.durationMinutes}
                 onDelete={() => handleDeleteInactive(item.id)}
+                onActivate={() => handleActivateInactive(item)}
               />
             ))}
           </View>

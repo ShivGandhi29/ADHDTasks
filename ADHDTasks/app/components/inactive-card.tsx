@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Pressable, Text, View, StyleSheet } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
 
@@ -6,13 +6,16 @@ type InactiveCardProps = {
   task: string;
   durationMinutes: number;
   onDelete: () => void;
+  onActivate: () => void;
 };
 
 export default function InactiveCard({
   task,
   durationMinutes,
   onDelete,
+  onActivate,
 }: InactiveCardProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
   const renderRightActions = () => (
     <View style={styles.deleteContainer}>
       <Pressable style={styles.deleteButton} onPress={onDelete}>
@@ -23,11 +26,18 @@ export default function InactiveCard({
 
   return (
     <Swipeable renderRightActions={renderRightActions}>
-      <View style={styles.card}>
-        <Text style={styles.taskLabel}>Up next</Text>
-        <Text style={styles.taskText}>{task}</Text>
-        <Text style={styles.metaText}>{durationMinutes} min</Text>
-      </View>
+      <Pressable onPress={() => setIsExpanded((current) => !current)}>
+        <View style={styles.card}>
+          <Text style={styles.taskLabel}>Up next</Text>
+          <Text style={styles.taskText}>{task}</Text>
+          <Text style={styles.metaText}>{durationMinutes} min</Text>
+          {isExpanded && (
+            <Pressable style={styles.startNowButton} onPress={onActivate}>
+              <Text style={styles.startNowText}>Start now</Text>
+            </Pressable>
+          )}
+        </View>
+      </Pressable>
     </Swipeable>
   );
 }
@@ -70,5 +80,17 @@ const styles = StyleSheet.create({
   metaText: {
     fontSize: 14,
     color: "#666",
+  },
+  startNowButton: {
+    marginTop: 12,
+    backgroundColor: "#111",
+    paddingVertical: 10,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  startNowText: {
+    color: "#FFF",
+    fontSize: 14,
+    fontWeight: "600",
   },
 });
