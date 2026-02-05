@@ -36,6 +36,7 @@ export default function History() {
                 task={item.task}
                 durationMinutes={item.durationMinutes}
                 onDelete={() => {}}
+                onActivate={() => {}}
               />
             ))}
           </View>

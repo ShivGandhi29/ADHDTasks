@@ -14,6 +14,7 @@ export default function NewTask() {
   const [taskName, setTaskName] = useState("");
   const [durationMinutes, setDurationMinutes] = useState("");
   const router = useRouter();
+  const maxTaskLines = 5;
 
   const handleAddTask = async () => {
     const trimmedName = taskName.trim();
@@ -40,6 +41,15 @@ export default function NewTask() {
     }
   };
 
+  const handleTaskNameChange = (value: string) => {
+    const lines = value.split(/\r?\n/);
+    if (lines.length > maxTaskLines) {
+      setTaskName(lines.slice(0, maxTaskLines).join("\n"));
+      return;
+    }
+    setTaskName(value);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.card}>
@@ -52,11 +62,12 @@ export default function NewTask() {
             style={styles.input}
             placeholder="Reply to council email"
             value={taskName}
-            onChangeText={setTaskName}
+            onChangeText={handleTaskNameChange}
             autoCapitalize="sentences"
             returnKeyType="next"
             multiline={true}
-            numberOfLines={10}
+            numberOfLines={5}
+            scrollEnabled={false}
           />
         </View>
 
