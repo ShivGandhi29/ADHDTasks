@@ -1,42 +1,55 @@
-import React, { useState } from "react";
-import { SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
-import ActiveCard from "../components/active-card";
-import InactiveCard from "../components/inactive-card";
+import React, { useCallback, useState } from "react";
+import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useFocusEffect } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+import PastCard from "../components/past-card";
+import { getTasks, removeTask, TaskItem } from "../data/tasks";
+import { AppColors } from "../components/ui/ThemeColors";
 
 export default function History() {
-  const [inactiveTasks, setInactiveTasks] = useState<
-    { id: string; task: string; durationMinutes: number }[]
-  >([]);
+  const [tasks, setTasks] = useState<TaskItem[]>([]);
 
-  const activeTask = {
-    task: "Reply to council email",
-    durationMinutes: 10,
-  };
+  const loadTasks = useCallback(async () => {
+    const existing = await getTasks();
+    const sorted = [...existing].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+    setTasks(sorted);
+  }, []);
 
-  const handleAddToInactive = (task: string, durationMinutes: number) => {
-    setInactiveTasks((current) => [
-      ...current,
-      { id: `${Date.now()}-${current.length}`, task, durationMinutes },
+  useFocusEffect(
+    useCallback(() => {
+      loadTasks();
+    }, [loadTasks])
+  );
+
+  const handleDelete = (taskId: string) => {
+    Alert.alert("Delete task?", "This will remove it from your history.", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => {
+          await removeTask(taskId);
+          loadTasks();
+        },
+      },
     ]);
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
-        <ActiveCard
-          task={activeTask.task}
-          durationMinutes={activeTask.durationMinutes}
-          onAddToInactive={handleAddToInactive}
-        />
-        {inactiveTasks.length > 0 && (
+        {tasks.length === 0 ? (
+          <Text style={styles.emptyText}>No past tasks yet.</Text>
+        ) : (
           <View style={styles.list}>
-            {inactiveTasks.map((item) => (
-              <InactiveCard
+            {tasks.map((item) => (
+              <PastCard
                 key={item.id}
-                task={item.task}
+                task={item.name}
                 durationMinutes={item.durationMinutes}
-                onDelete={() => {}}
-                onActivate={() => {}}
+                onDelete={() => handleDelete(item.id)}
               />
             ))}
           </View>
@@ -48,7 +61,7 @@ export default function History() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8F8F8",
+    backgroundColor: AppColors.OffWhite,
   },
   content: {
     padding: 24,
@@ -56,5 +69,11 @@ const styles = StyleSheet.create({
   },
   list: {
     gap: 12,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: AppColors.SlateGray,
+    textAlign: "center",
+    marginTop: 32,
   },
 });

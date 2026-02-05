@@ -1,13 +1,16 @@
 import React, { useCallback, useState } from "react";
-import { Alert, SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
-import { useFocusEffect } from "expo-router";
+import { Alert, ScrollView, StyleSheet, View } from "react-native";
+import { useFocusEffect, useRouter } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 import ActiveCard from "../components/active-card";
 import InactiveCard from "../components/inactive-card";
 import { addTask, getTasks, removeTask, TaskItem } from "../data/tasks";
+import { AppColors } from "../components/ui/ThemeColors";
 
 export default function HomeScreen() {
   const [inactiveTasks, setInactiveTasks] = useState<TaskItem[]>([]);
   const [isActiveRunning, setIsActiveRunning] = useState(false);
+  const router = useRouter();
   const [activeTask, setActiveTask] = useState<{
     task: string;
     durationMinutes: number;
@@ -78,6 +81,10 @@ export default function HomeScreen() {
     activateInactiveTask(task);
   };
 
+  const handleCancelActive = () => {
+    router.navigate("/(tabs)/history");
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -93,6 +100,7 @@ export default function HomeScreen() {
             durationMinutes={activeTask.durationMinutes}
             onAddToInactive={handleAddToInactive}
             onRunningChange={setIsActiveRunning}
+            onCancel={handleCancelActive}
           />
         </View>
         {!isActiveRunning && inactiveTasks.length > 0 && (
@@ -115,7 +123,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: AppColors.White,
   },
   content: {
     padding: 24,

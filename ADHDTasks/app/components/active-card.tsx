@@ -1,12 +1,14 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { CountdownCircleTimer } from "react-native-countdown-circle-timer";
+import { AppColors } from "./ui/ThemeColors";
 
 type ActiveCardProps = {
   task: string;
   durationMinutes?: number;
   onAddToInactive: (task: string, durationMinutes: number) => void;
   onRunningChange?: (isRunning: boolean) => void;
+  onCancel?: () => void;
 };
 
 export default function ActiveCard({
@@ -14,6 +16,7 @@ export default function ActiveCard({
   durationMinutes = 10,
   onAddToInactive,
   onRunningChange,
+  onCancel,
 }: ActiveCardProps) {
   const durationSeconds = useMemo(() => durationMinutes * 60, [durationMinutes]);
   const [isRunning, setIsRunning] = useState(false);
@@ -58,8 +61,13 @@ export default function ActiveCard({
     setRemainingSeconds(0);
   };
 
-  const onSkip = () => {
-    console.log("Skip for now");
+  const handleCancel = () => {
+    handleAdd();
+    setIsRunning(false);
+    setIsPaused(false);
+    setRemainingSeconds(durationSeconds);
+    setTimerKey((current) => current + 1);
+    onCancel?.();
   };
 
   const handleAdd = () => {
@@ -79,7 +87,7 @@ export default function ActiveCard({
             isPlaying={!isPaused}
             duration={durationSeconds}
             initialRemainingTime={remainingSeconds}
-            colors={["#111", "#666", "#A30000"]}
+            colors={[AppColors.TextDark, AppColors.SlateGray, AppColors.AccentRed]}
             colorsTime={[durationSeconds, Math.max(2, durationSeconds * 0.3), 0]}
             strokeWidth={10}
             size={180}
@@ -124,6 +132,9 @@ export default function ActiveCard({
         >
           <Text style={styles.secondaryButtonText}>Complete</Text>
         </Pressable>
+        <Pressable style={styles.secondaryButton} onPress={handleCancel}>
+          <Text style={styles.secondaryButtonText}>Cancel</Text>
+        </Pressable>
       </View>
 
       <Text style={styles.reassurance}>Focus!!!</Text>
@@ -138,10 +149,10 @@ export default function ActiveCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: AppColors.White,
     borderRadius: 20,
     padding: 44,
-    shadowColor: "#000",
+    shadowColor: AppColors.Black,
     shadowOpacity: 0.08,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 6 },
@@ -154,7 +165,7 @@ const styles = StyleSheet.create({
   },
   timerText: {
     fontSize: 22,
-    color: "#111",
+    color: AppColors.TextDark,
     fontWeight: "600",
   },
   cardFullScreen: {
@@ -170,36 +181,36 @@ const styles = StyleSheet.create({
   },
   taskLabel: {
     fontSize: 14,
-    color: "#888",
+    color: AppColors.MutedGray,
     marginBottom: 8,
   },
   taskText: {
     fontSize: 28,
     fontWeight: "600",
-    color: "#111",
+    color: AppColors.TextDark,
     marginBottom: 32,
   },
   primaryButton: {
-    backgroundColor: "#111",
+    backgroundColor: AppColors.TextDark,
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: "center",
     marginBottom: 12,
   },
   primaryButtonText: {
-    color: "#FFF",
+    color: AppColors.White,
     fontSize: 18,
     fontWeight: "600",
   },
   reassurance: {
     fontSize: 14,
-    color: "#666",
+    color: AppColors.SlateGray,
     textAlign: "center",
     marginBottom: 16,
   },
   countdownText: {
     fontSize: 14,
-    color: "#444",
+    color: AppColors.Charcoal,
     textAlign: "center",
     marginBottom: 8,
   },
@@ -211,22 +222,22 @@ const styles = StyleSheet.create({
   },
   secondaryButton: {
     borderWidth: 1,
-    borderColor: "#DDD",
+    borderColor: AppColors.BorderGray,
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 10,
   },
   secondaryActive: {
-    backgroundColor: "#F2F2F2",
+    backgroundColor: AppColors.WhiteSmoke,
   },
   secondaryButtonText: {
     fontSize: 14,
-    color: "#222",
+    color: AppColors.Ink,
     fontWeight: "600",
   },
   skipText: {
     fontSize: 16,
-    color: "#666",
+    color: AppColors.SlateGray,
     textAlign: "center",
   },
   addButton: {
@@ -235,13 +246,13 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: "#F2F2F2",
+    backgroundColor: AppColors.WhiteSmoke,
     alignItems: "center",
     justifyContent: "center",
   },
   addButtonText: {
     fontSize: 32,
-    color: "#111",
+    color: AppColors.TextDark,
     marginBottom: 2,
   },
 });

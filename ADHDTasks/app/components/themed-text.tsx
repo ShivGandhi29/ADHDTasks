@@ -1,6 +1,7 @@
 import { StyleSheet, Text, type TextProps } from 'react-native';
 
 import { useThemeColor } from '../hooks/use-theme-color';
+import { AppColors } from './ui/ThemeColors';
 
 export type ThemedTextProps = TextProps & {
   lightColor?: string;
@@ -33,6 +34,8 @@ export function ThemedText({
   );
 }
 
+export default ThemedText;
+
 const styles = StyleSheet.create({
   default: {
     fontSize: 16,
@@ -55,6 +58,6 @@ const styles = StyleSheet.create({
   link: {
     lineHeight: 30,
     fontSize: 16,
-    color: '#0a7ea4',
+    color: AppColors.BrandBlue,
   },
 });

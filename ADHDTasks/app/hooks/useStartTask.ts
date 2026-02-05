@@ -61,3 +61,7 @@ export function useStartTask(durationSeconds: number): UseStartTaskResult {
     remainingSeconds,
   };
 }
+
+export default function UseStartTaskScreen() {
+  return null;
+}

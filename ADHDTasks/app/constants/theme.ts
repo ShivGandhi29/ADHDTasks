@@ -5,24 +5,26 @@
 
 import { Platform } from 'react-native';
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+import { AppColors } from "../components/ui/ThemeColors";
+
+const tintColorLight = AppColors.BrandBlue;
+const tintColorDark = AppColors.White;
 
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#fff',
+    text: AppColors.TextDarker,
+    background: AppColors.White,
     tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
+    icon: AppColors.IconGray,
+    tabIconDefault: AppColors.IconGray,
     tabIconSelected: tintColorLight,
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
+    text: AppColors.TextLight,
+    background: AppColors.BackgroundDark,
     tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
+    icon: AppColors.IconGrayLight,
+    tabIconDefault: AppColors.IconGrayLight,
     tabIconSelected: tintColorDark,
   },
 };
@@ -51,3 +53,7 @@ export const Fonts = Platform.select({
     mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
   },
 });
+
+export default function ThemeScreen() {
+  return null;
+}

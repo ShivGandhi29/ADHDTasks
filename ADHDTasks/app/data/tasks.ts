@@ -30,3 +30,7 @@ export async function removeTask(taskId: string): Promise<void> {
   const filtered = tasks.filter((task) => task.id !== taskId);
   await AsyncStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(filtered));
 }
+
+export default function TasksScreen() {
+  return null;
+}

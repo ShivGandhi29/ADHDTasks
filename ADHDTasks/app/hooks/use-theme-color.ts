@@ -19,3 +19,7 @@ export function useThemeColor(
     return Colors[theme][colorName];
   }
 }
+
+export default function UseThemeColorScreen() {
+  return null;
+}

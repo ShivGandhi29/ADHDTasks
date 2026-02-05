@@ -1,14 +1,9 @@
 import React, { useState } from "react";
-import {
-  Pressable,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { useRouter } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { addTask, TaskItem } from "../data/tasks";
+import { AppColors } from "../components/ui/ThemeColors";
 
 export default function NewTask() {
   const [taskName, setTaskName] = useState("");
@@ -120,14 +115,14 @@ export default function NewTask() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8F8F8",
+    backgroundColor: AppColors.OffWhite,
     padding: 24,
   },
   card: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: AppColors.White,
     borderRadius: 20,
     padding: 24,
-    shadowColor: "#000",
+    shadowColor: AppColors.Black,
     shadowOpacity: 0.08,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 6 },
@@ -136,13 +131,13 @@ const styles = StyleSheet.create({
   },
   taskLabel: {
     fontSize: 14,
-    color: "#888",
+    color: AppColors.MutedGray,
     marginBottom: 8,
   },
   taskText: {
     fontSize: 28,
     fontWeight: "600",
-    color: "#111",
+    color: AppColors.TextDark,
     marginBottom: 24,
   },
   field: {
@@ -150,18 +145,18 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    color: "#666",
+    color: AppColors.SlateGray,
     marginBottom: 8,
   },
   input: {
-    backgroundColor: "#FFF",
+    backgroundColor: AppColors.White,
     borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 16,
-    color: "#111",
+    color: AppColors.TextDark,
     borderWidth: 1,
-    borderColor: "#E6E6E6",
+    borderColor: AppColors.LightGray,
   },
   timeRow: {
     gap: 12,
@@ -169,22 +164,22 @@ const styles = StyleSheet.create({
   timeInputWrapper: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFF",
+    backgroundColor: AppColors.White,
     borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderWidth: 1,
-    borderColor: "#E6E6E6",
+    borderColor: AppColors.LightGray,
   },
   timeInput: {
     flex: 1,
     fontSize: 16,
-    color: "#111",
+    color: AppColors.TextDark,
     paddingVertical: 0,
   },
   timeSuffix: {
     fontSize: 14,
-    color: "#888",
+    color: AppColors.MutedGray,
     marginLeft: 8,
   },
   chipRow: {
@@ -194,33 +189,33 @@ const styles = StyleSheet.create({
   },
   chip: {
     borderWidth: 1,
-    borderColor: "#E6E6E6",
-    backgroundColor: "#FFF",
+    borderColor: AppColors.LightGray,
+    backgroundColor: AppColors.White,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 999,
   },
   chipActive: {
-    borderColor: "#111",
-    backgroundColor: "#111",
+    borderColor: AppColors.TextDark,
+    backgroundColor: AppColors.TextDark,
   },
   chipText: {
     fontSize: 13,
-    color: "#222",
+    color: AppColors.Ink,
     fontWeight: "600",
   },
   chipTextActive: {
-    color: "#FFF",
+    color: AppColors.White,
   },
   primaryButton: {
-    backgroundColor: "#111",
+    backgroundColor: AppColors.TextDark,
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: "center",
     marginTop: 8,
   },
   primaryButtonText: {
-    color: "#FFF",
+    color: AppColors.White,
     fontSize: 18,
     fontWeight: "600",
   },

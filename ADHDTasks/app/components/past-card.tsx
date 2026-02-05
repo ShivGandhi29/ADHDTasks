@@ -1,22 +1,21 @@
-import React, { useState } from "react";
+import React from "react";
 import { Pressable, Text, View, StyleSheet } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
 import { AppColors } from "./ui/ThemeColors";
 
-type InactiveCardProps = {
+type PastCardProps = {
   task: string;
   durationMinutes: number;
   onDelete: () => void;
-  onActivate: () => void;
+  onReactivate?: () => void;
 };
 
-export default function InactiveCard({
+export default function PastCard({
   task,
   durationMinutes,
   onDelete,
-  onActivate,
-}: InactiveCardProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  onReactivate,
+}: PastCardProps) {
   const renderRightActions = () => (
     <View style={styles.deleteContainer}>
       <Pressable style={styles.deleteButton} onPress={onDelete}>
@@ -27,18 +26,16 @@ export default function InactiveCard({
 
   return (
     <Swipeable renderRightActions={renderRightActions}>
-      <Pressable onPress={() => setIsExpanded((current) => !current)}>
-        <View style={styles.card}>
-          <Text style={styles.taskLabel}>Up next</Text>
-          <Text style={styles.taskText}>{task}</Text>
-          <Text style={styles.metaText}>{durationMinutes} min</Text>
-          {isExpanded && (
-            <Pressable style={styles.startNowButton} onPress={onActivate}>
-              <Text style={styles.startNowText}>Start now</Text>
-            </Pressable>
-          )}
-        </View>
-      </Pressable>
+      <View style={styles.card}>
+        <Text style={styles.taskLabel}>Past task</Text>
+        <Text style={styles.taskText}>{task}</Text>
+        <Text style={styles.metaText}>{durationMinutes} min</Text>
+        {onReactivate && (
+          <Pressable style={styles.reactivateButton} onPress={onReactivate}>
+            <Text style={styles.reactivateText}>Reactivate</Text>
+          </Pressable>
+        )}
+      </View>
     </Swipeable>
   );
 }
@@ -48,7 +45,6 @@ const styles = StyleSheet.create({
     backgroundColor: AppColors.OffWhite,
     borderRadius: 20,
     padding: 20,
-
   },
   deleteContainer: {
     justifyContent: "center",
@@ -82,14 +78,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: AppColors.SlateGray,
   },
-  startNowButton: {
+  reactivateButton: {
     marginTop: 12,
     backgroundColor: AppColors.TextDark,
     paddingVertical: 10,
     borderRadius: 10,
     alignItems: "center",
   },
-  startNowText: {
+  reactivateText: {
     color: AppColors.White,
     fontSize: 14,
     fontWeight: "600",
