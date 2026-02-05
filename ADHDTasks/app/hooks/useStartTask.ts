@@ -2,44 +2,62 @@ import { useCallback, useEffect, useState } from "react";
 
 type UseStartTaskResult = {
   isRunning: boolean;
+  isPaused: boolean;
   onStart: () => void;
+  onPause: () => void;
+  onComplete: () => void;
   remainingSeconds: number;
 };
 
 export function useStartTask(durationSeconds: number): UseStartTaskResult {
-  const [endTimeMs, setEndTimeMs] = useState<number | null>(null);
   const [remainingSeconds, setRemainingSeconds] =
     useState<number>(durationSeconds);
+  const [isRunning, setIsRunning] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
 
   const onStart = useCallback(() => {
     console.log("Start task");
-    const endTime = Date.now() + durationSeconds * 1000;
-    setEndTimeMs(endTime);
-    setRemainingSeconds(durationSeconds);
+    setIsRunning(true);
+    setIsPaused(false);
+    setRemainingSeconds((current) =>
+      current > 0 && current < durationSeconds ? current : durationSeconds
+    );
   }, [durationSeconds]);
 
+  const onPause = useCallback(() => {
+    setIsRunning(false);
+    setIsPaused(true);
+  }, []);
+
+  const onComplete = useCallback(() => {
+    setIsRunning(false);
+    setIsPaused(false);
+    setRemainingSeconds(0);
+  }, []);
+
   useEffect(() => {
-    if (!endTimeMs) return;
+    if (!isRunning) return;
 
-    const tick = () => {
-      const remainingMs = endTimeMs - Date.now();
-      const nextSeconds = Math.max(0, Math.ceil(remainingMs / 1000));
-      setRemainingSeconds(nextSeconds);
-
-      if (remainingMs <= 0) {
-        setEndTimeMs(null);
-      }
-    };
-
-    tick();
-    const intervalId = setInterval(tick, 1000);
+    const intervalId = setInterval(() => {
+      setRemainingSeconds((current) => {
+        const nextSeconds = Math.max(0, current - 1);
+        if (nextSeconds === 0) {
+          setIsRunning(false);
+          setIsPaused(false);
+        }
+        return nextSeconds;
+      });
+    }, 1000);
 
     return () => clearInterval(intervalId);
-  }, [endTimeMs]);
+  }, [isRunning]);
 
   return {
-    isRunning: endTimeMs !== null,
+    isRunning,
+    isPaused,
     onStart,
+    onPause,
+    onComplete,
     remainingSeconds,
   };
 }

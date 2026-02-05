@@ -5,12 +5,16 @@ export default function TabLayout() {
   return (
     <NativeTabs>
       <NativeTabs.Trigger name="home">
-        <Label>Home</Label>
+        <Label>Now</Label>
         <Icon sf="house.fill" />
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="newTask">
+      <NativeTabs.Trigger name="newTask" role="search">
         <Label>Add</Label>
-        <Icon sf="plus.circle.fill" />
+        <Icon sf="plus" />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="history">
+        <Label>History</Label>
+        <Icon sf="gear" />
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="settings">
         <Label>Settings</Label>
