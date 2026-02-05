@@ -34,14 +34,10 @@ export default function InactiveCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#F8F8F8",
     borderRadius: 20,
     padding: 20,
-    shadowColor: "#000",
-    shadowOpacity: 0.06,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 2,
+
   },
   deleteContainer: {
     justifyContent: "center",

@@ -7,6 +7,7 @@ import { addTask, getTasks, removeTask, TaskItem } from "../data/tasks";
 
 export default function HomeScreen() {
   const [inactiveTasks, setInactiveTasks] = useState<TaskItem[]>([]);
+  const [isActiveRunning, setIsActiveRunning] = useState(false);
 
   const activeTask = {
     task: "Reply to council email",
@@ -51,13 +52,22 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content}>
-        <ActiveCard
-          task={activeTask.task}
-          durationMinutes={activeTask.durationMinutes}
-          onAddToInactive={handleAddToInactive}
-        />
-        {inactiveTasks.length > 0 && (
+      <ScrollView
+        contentContainerStyle={[
+          styles.content,
+          isActiveRunning && styles.contentFullScreen,
+        ]}
+        scrollEnabled={!isActiveRunning}
+      >
+        <View style={isActiveRunning ? styles.activeFullScreen : undefined}>
+          <ActiveCard
+            task={activeTask.task}
+            durationMinutes={activeTask.durationMinutes}
+            onAddToInactive={handleAddToInactive}
+            onRunningChange={setIsActiveRunning}
+          />
+        </View>
+        {!isActiveRunning && inactiveTasks.length > 0 && (
           <View style={styles.list}>
             {inactiveTasks.map((item) => (
               <InactiveCard
@@ -76,7 +86,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8F8F8",
+    backgroundColor: "#FFFFFF",
   },
   content: {
     padding: 24,
@@ -84,5 +94,12 @@ const styles = StyleSheet.create({
   },
   list: {
     gap: 12,
+  },
+  contentFullScreen: {
+    flexGrow: 1,
+    padding: 0,
+  },
+  activeFullScreen: {
+    flex: 1,
   },
 });

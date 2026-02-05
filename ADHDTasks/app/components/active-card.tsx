@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useStartTask } from "../hooks/useStartTask";
 
@@ -6,17 +6,23 @@ type ActiveCardProps = {
   task: string;
   durationMinutes?: number;
   onAddToInactive: (task: string, durationMinutes: number) => void;
+  onRunningChange?: (isRunning: boolean) => void;
 };
 
 export default function ActiveCard({
   task,
   durationMinutes = 10,
   onAddToInactive,
+  onRunningChange,
 }: ActiveCardProps) {
   const { isRunning, isPaused, onStart, onPause, onComplete, remainingSeconds } =
     useStartTask(
     durationMinutes * 60
     );
+
+  useEffect(() => {
+    onRunningChange?.(isRunning);
+  }, [isRunning, onRunningChange]);
 
   const formatTime = (totalSeconds: number) => {
     const minutes = Math.floor(totalSeconds / 60);
@@ -36,7 +42,7 @@ export default function ActiveCard({
   };
 
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, isRunning && styles.cardFullScreen]}>
       <Text style={styles.taskLabel}>Right now</Text>
 
       <Text style={styles.taskText}>{task}</Text>
@@ -93,6 +99,17 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 6 },
     elevation: 3,
     //margin: 24,
+  },
+  cardFullScreen: {
+    flex: 1,
+    width: "100%",
+    borderRadius: 0,
+    paddingHorizontal: 32,
+    paddingVertical: 48,
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    shadowOffset: { width: 0, height: 0 },
+    elevation: 0,
   },
   taskLabel: {
     fontSize: 14,
