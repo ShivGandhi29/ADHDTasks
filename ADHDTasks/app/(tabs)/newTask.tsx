@@ -1,7 +1,7 @@
 import { Text, View } from "react-native";
 import AppleSignInButton from "../components/auth/AppleSignInButton";
 
-export default function Login() {
+export default function NewTask() {
   return (
     <View
       style={{
@@ -10,8 +10,7 @@ export default function Login() {
         alignItems: "center",
       }}
     >
-      <Text>Login</Text>
-      <AppleSignInButton />
+      <Text>New Task</Text>
     </View>
   );
 }
