@@ -1,5 +1,5 @@
-import React, { useCallback, useState } from "react";
-import { Alert, ScrollView, StyleSheet, View } from "react-native";
+import React, { useCallback, useMemo, useState } from "react";
+import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useFocusEffect, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ActiveCard from "../components/active-card";
@@ -11,6 +11,12 @@ export default function HomeScreen() {
   const [inactiveTasks, setInactiveTasks] = useState<TaskItem[]>([]);
   const [isActiveRunning, setIsActiveRunning] = useState(false);
   const router = useRouter();
+  const greeting = useMemo(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 18) return "Good afternoon";
+    return "Good evening";
+  }, []);
   const [activeTask, setActiveTask] = useState<{
     task: string;
     durationMinutes: number;
@@ -94,6 +100,11 @@ export default function HomeScreen() {
         ]}
         scrollEnabled={!isActiveRunning}
       >
+        {!isActiveRunning && (
+          <View style={styles.header}>
+            <Text style={styles.greeting}>{greeting}</Text>
+          </View>
+        )}
         <View style={isActiveRunning ? styles.activeFullScreen : undefined}>
           <ActiveCard
             task={activeTask.task}
@@ -131,6 +142,14 @@ const styles = StyleSheet.create({
   },
   list: {
     gap: 12,
+  },
+  header: {
+    marginBottom: 4,
+  },
+  greeting: {
+    fontSize: 32,
+    fontWeight: "600",
+    color: AppColors.TextDark,
   },
   contentFullScreen: {
     flexGrow: 1,
