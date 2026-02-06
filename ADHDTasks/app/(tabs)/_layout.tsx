@@ -37,6 +37,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <IconSymbol name="house.fill" color={color} size={size} />
           ),
+          headerShown: false,
         }}
       />
       <Tabs.Screen
@@ -46,6 +47,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <IconSymbol name="plus" color={color} size={size} />
           ),
+          headerShown: false,
         }}
       />
       <Tabs.Screen
@@ -55,6 +57,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <IconSymbol name="paperplane.fill" color={color} size={size} />
           ),
+          headerShown: false,
         }}
       />
       <Tabs.Screen
@@ -64,6 +67,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <IconSymbol name="gearshape" color={color} size={size} />
           ),
+          headerShown: false,
         }}
       />
     </Tabs>
