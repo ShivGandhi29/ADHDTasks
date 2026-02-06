@@ -6,17 +6,17 @@ import { AppColors } from "./ui/ThemeColors";
 type ActiveCardProps = {
   task: string;
   durationMinutes?: number;
-  onAddToInactive: (task: string, durationMinutes: number) => void;
   onRunningChange?: (isRunning: boolean) => void;
   onCancel?: () => void;
+  onComplete?: () => void;
 };
 
 export default function ActiveCard({
   task,
   durationMinutes = 10,
-  onAddToInactive,
   onRunningChange,
   onCancel,
+  onComplete,
 }: ActiveCardProps) {
   const durationSeconds = useMemo(() => durationMinutes * 60, [durationMinutes]);
   const [isRunning, setIsRunning] = useState(false);
@@ -55,23 +55,19 @@ export default function ActiveCard({
     setIsPaused(true);
   };
 
-  const onComplete = () => {
+  const handleComplete = () => {
     setIsRunning(false);
     setIsPaused(false);
     setRemainingSeconds(0);
+    onComplete?.();
   };
 
   const handleCancel = () => {
-    handleAdd();
     setIsRunning(false);
     setIsPaused(false);
     setRemainingSeconds(durationSeconds);
     setTimerKey((current) => current + 1);
     onCancel?.();
-  };
-
-  const handleAdd = () => {
-    onAddToInactive(task, durationMinutes);
   };
 
   return (
@@ -94,7 +90,7 @@ export default function ActiveCard({
             updateInterval={1}
             onUpdate={(remainingTime) => setRemainingSeconds(remainingTime)}
             onComplete={() => {
-              onComplete();
+              handleComplete();
               return { shouldRepeat: false };
             }}
           >
@@ -127,7 +123,7 @@ export default function ActiveCard({
         </Pressable>
         <Pressable
           style={styles.secondaryButton}
-          onPress={onComplete}
+          onPress={handleComplete}
           disabled={!isRunning && remainingSeconds === 0}
         >
           <Text style={styles.secondaryButtonText}>Complete</Text>

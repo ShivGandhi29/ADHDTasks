@@ -1,8 +1,15 @@
-import React, { useState } from "react";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import { useRouter } from "expo-router";
+import React, { useCallback, useState } from "react";
+import {
+  Alert,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import { useFocusEffect, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { addTask, TaskItem } from "../data/tasks";
+import { addTask, getActiveTask, getTasks, TaskItem } from "../data/tasks";
 import { AppColors } from "../components/ui/ThemeColors";
 
 export default function NewTask() {
@@ -11,7 +18,34 @@ export default function NewTask() {
   const router = useRouter();
   const maxTaskLines = 5;
 
+  const checkTaskLimits = useCallback(async () => {
+    const [active, inactive] = await Promise.all([getActiveTask(), getTasks()]);
+    const isBlocked = Boolean(active) && inactive.length >= 2;
+    if (isBlocked) {
+      Alert.alert(
+        "Finish existing tasks",
+        "Please complete your current tasks before creating new ones.",
+        [
+          {
+            text: "Lets get it done!",
+            onPress: () => router.navigate("/(tabs)/home"),
+          },
+        ],
+      );
+    }
+    return isBlocked;
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      checkTaskLimits();
+    }, [checkTaskLimits]),
+  );
+
   const handleAddTask = async () => {
+    if (await checkTaskLimits()) {
+      return;
+    }
     const trimmedName = taskName.trim();
     const parsedMinutes = Number(durationMinutes);
 
@@ -116,7 +150,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: AppColors.OffWhite,
-    padding: 24,
+    padding: 16,
+    justifyContent: "center",
   },
   card: {
     backgroundColor: AppColors.White,
@@ -127,7 +162,9 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 6 },
     elevation: 3,
-    margin: 24,
+    alignSelf: "center",
+    width: "100%",
+    maxWidth: 420,
   },
   taskLabel: {
     fontSize: 14,

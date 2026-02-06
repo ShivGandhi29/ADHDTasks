@@ -3,14 +3,14 @@ import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useFocusEffect } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import PastCard from "../components/past-card";
-import { getTasks, removeTask, TaskItem } from "../data/tasks";
+import { getHistoryTasks, removeHistoryTask, TaskItem } from "../data/tasks";
 import { AppColors } from "../components/ui/ThemeColors";
 
 export default function History() {
   const [tasks, setTasks] = useState<TaskItem[]>([]);
 
   const loadTasks = useCallback(async () => {
-    const existing = await getTasks();
+    const existing = await getHistoryTasks();
     const sorted = [...existing].sort(
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
@@ -30,7 +30,7 @@ export default function History() {
         text: "Delete",
         style: "destructive",
         onPress: async () => {
-          await removeTask(taskId);
+          await removeHistoryTask(taskId);
           loadTasks();
         },
       },
