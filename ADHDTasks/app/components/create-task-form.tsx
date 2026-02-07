@@ -42,12 +42,8 @@ export default function CreateTaskForm({
   }, [initialDuration]);
 
   const handleTaskNameChange = (value: string) => {
-    const lines = value.split(/\r?\n/);
-    if (lines.length > maxTaskLines) {
-      setTaskName(lines.slice(0, maxTaskLines).join("\n"));
-      return;
-    }
-    setTaskName(value);
+    // Strip newlines — enter key is blocked, but handle paste too
+    setTaskName(value.replace(/[\r\n]+/g, " "));
   };
 
   const handleSubmit = () => {
@@ -75,13 +71,18 @@ export default function CreateTaskForm({
         value={taskName}
         onChangeText={handleTaskNameChange}
         autoCapitalize="sentences"
-        returnKeyType="next"
+        returnKeyType="done"
         multiline={true}
-        numberOfLines={3}
+        blurOnSubmit={true}
+        onKeyPress={({ nativeEvent }) => {
+          if (nativeEvent.key === "Enter") {
+            // swallow the enter key
+          }
+        }}
         scrollEnabled={false}
       />
 
-      <Text style={styles.fieldLabel}>Duration</Text>
+      <Text style={styles.fieldLabel}>How long will this take?</Text>
       <View style={styles.timeRow}>
         <TextInput
           style={styles.timeInput}
