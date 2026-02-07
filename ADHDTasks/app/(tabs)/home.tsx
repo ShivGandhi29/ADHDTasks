@@ -1,17 +1,10 @@
 import React, { useCallback, useMemo, useState } from "react";
-import {
-  Alert,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useFocusEffect, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ActiveCard from "../components/active-card";
 import InactiveCard from "../components/inactive-card";
+import CreateTaskForm from "../components/create-task-form";
 import {
   addHistoryTask,
   addTask,
@@ -38,8 +31,6 @@ export default function HomeScreen() {
     task: string;
     durationMinutes: number;
   } | null>(null);
-  const [draftTaskName, setDraftTaskName] = useState("");
-  const [draftDurationMinutes, setDraftDurationMinutes] = useState("");
 
   const loadTasks = useCallback(async () => {
     const [tasks, active] = await Promise.all([getTasks(), getActiveTask()]);
@@ -148,22 +139,15 @@ export default function HomeScreen() {
     await setActiveTaskStorage(updated);
   };
 
-  const handleCreateActive = async () => {
-    const trimmedName = draftTaskName.trim();
-    const parsedMinutes = Number(draftDurationMinutes);
-    if (!trimmedName || !Number.isFinite(parsedMinutes) || parsedMinutes <= 0) {
-      return;
-    }
+  const handleCreateActive = async (taskName: string, minutes: number) => {
     const newActive: TaskItem = {
       id: `${Date.now()}`,
-      name: trimmedName,
-      durationMinutes: parsedMinutes,
+      name: taskName,
+      durationMinutes: minutes,
       createdAt: new Date().toISOString(),
     };
-    setActiveTask({ task: trimmedName, durationMinutes: parsedMinutes });
+    setActiveTask({ task: taskName, durationMinutes: minutes });
     await setActiveTaskStorage(newActive);
-    setDraftTaskName("");
-    setDraftDurationMinutes("");
   };
 
   return (
@@ -192,64 +176,10 @@ export default function HomeScreen() {
             />
           </View>
         ) : (
-          <View style={styles.newTaskCard}>
-            <Text style={styles.taskLabel}>Create task</Text>
-            <Text style={styles.taskTitle}>New Task</Text>
-            <View style={styles.field}>
-              <Text style={styles.label}>Task name</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Reply to council email"
-                value={draftTaskName}
-                onChangeText={setDraftTaskName}
-                autoCapitalize="sentences"
-                returnKeyType="next"
-                multiline={true}
-                numberOfLines={3}
-                scrollEnabled={false}
-              />
-            </View>
-            <View style={styles.field}>
-              <Text style={styles.label}>How long will this take?</Text>
-              <View style={styles.timeRow}>
-                <View style={styles.timeInputWrapper}>
-                  <TextInput
-                    style={styles.timeInput}
-                    placeholder="10"
-                    value={draftDurationMinutes}
-                    onChangeText={setDraftDurationMinutes}
-                    keyboardType="number-pad"
-                    returnKeyType="done"
-                  />
-                  <Text style={styles.timeSuffix}>min</Text>
-                </View>
-                <View style={styles.chipRow}>
-                  {["5", "10", "15", "25"].map((value) => (
-                    <Pressable
-                      key={value}
-                      style={[
-                        styles.chip,
-                        draftDurationMinutes === value && styles.chipActive,
-                      ]}
-                      onPress={() => setDraftDurationMinutes(value)}
-                    >
-                      <Text
-                        style={[
-                          styles.chipText,
-                          draftDurationMinutes === value && styles.chipTextActive,
-                        ]}
-                      >
-                        {value}m
-                      </Text>
-                    </Pressable>
-                  ))}
-                </View>
-              </View>
-            </View>
-            <Pressable style={styles.primaryButton} onPress={handleCreateActive}>
-              <Text style={styles.primaryButtonText}>Create Task</Text>
-            </Pressable>
-          </View>
+          <CreateTaskForm
+            onSubmit={handleCreateActive}
+            submitLabel="Start task"
+          />
         )}
         {!isActiveRunning && inactiveTasks.length > 0 && (
           <View style={styles.list}>
@@ -295,105 +225,5 @@ const styles = StyleSheet.create({
   },
   activeFullScreen: {
     flex: 1,
-  },
-  newTaskCard: {
-    backgroundColor: AppColors.White,
-    borderRadius: 20,
-    padding: 24,
-    shadowColor: AppColors.Black,
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 3,
-  },
-  taskLabel: {
-    fontSize: 14,
-    color: AppColors.MutedGray,
-    marginBottom: 8,
-  },
-  taskTitle: {
-    fontSize: 28,
-    fontWeight: "600",
-    color: AppColors.TextDark,
-    marginBottom: 24,
-  },
-  field: {
-    marginBottom: 16,
-  },
-  label: {
-    fontSize: 14,
-    color: AppColors.SlateGray,
-    marginBottom: 8,
-  },
-  input: {
-    backgroundColor: AppColors.White,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: AppColors.TextDark,
-    borderWidth: 1,
-    borderColor: AppColors.LightGray,
-  },
-  timeRow: {
-    gap: 12,
-  },
-  timeInputWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: AppColors.White,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderWidth: 1,
-    borderColor: AppColors.LightGray,
-  },
-  timeInput: {
-    flex: 1,
-    fontSize: 16,
-    color: AppColors.TextDark,
-    paddingVertical: 0,
-  },
-  timeSuffix: {
-    fontSize: 14,
-    color: AppColors.MutedGray,
-    marginLeft: 8,
-  },
-  chipRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  chip: {
-    borderWidth: 1,
-    borderColor: AppColors.LightGray,
-    backgroundColor: AppColors.White,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 999,
-  },
-  chipActive: {
-    borderColor: AppColors.TextDark,
-    backgroundColor: AppColors.TextDark,
-  },
-  chipText: {
-    fontSize: 13,
-    color: AppColors.Ink,
-    fontWeight: "600",
-  },
-  chipTextActive: {
-    color: AppColors.White,
-  },
-  primaryButton: {
-    backgroundColor: AppColors.TextDark,
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: "center",
-    marginTop: 8,
-  },
-  primaryButtonText: {
-    color: AppColors.White,
-    fontSize: 18,
-    fontWeight: "600",
   },
 });

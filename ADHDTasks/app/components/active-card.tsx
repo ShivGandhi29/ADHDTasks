@@ -1,14 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  ScrollView,
-  View,
-  Text,
-  Pressable,
-  StyleSheet,
-  TextInput,
-} from "react-native";
+import { ScrollView, View, Text, Pressable, StyleSheet } from "react-native";
 import { CountdownCircleTimer } from "react-native-countdown-circle-timer";
 import { AppColors } from "./ui/ThemeColors";
+import CreateTaskForm from "./create-task-form";
 
 type ActiveCardProps = {
   task: string;
@@ -34,8 +28,6 @@ export default function ActiveCard({
   const [timerKey, setTimerKey] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
   const [isTimesUp, setIsTimesUp] = useState(false);
-  const [editedTask, setEditedTask] = useState(task);
-  const [editedDuration, setEditedDuration] = useState(String(durationMinutes));
 
   useEffect(() => {
     onRunningChange?.(isRunning);
@@ -45,11 +37,6 @@ export default function ActiveCard({
     setRemainingSeconds(durationSeconds);
     setTimerKey((current) => current + 1);
   }, [durationSeconds]);
-
-  useEffect(() => {
-    setEditedTask(task);
-    setEditedDuration(String(durationMinutes));
-  }, [task, durationMinutes]);
 
   const formatTime = (totalSeconds: number) => {
     const minutes = Math.floor(totalSeconds / 60);
@@ -101,19 +88,12 @@ export default function ActiveCard({
     onCancel?.();
   };
 
-  const handleSaveEdit = () => {
-    const trimmedName = editedTask.trim();
-    const parsedMinutes = Number(editedDuration);
-    if (!trimmedName || !Number.isFinite(parsedMinutes) || parsedMinutes <= 0) {
-      return;
-    }
-    onUpdate?.(trimmedName, parsedMinutes);
+  const handleSaveEdit = (name: string, minutes: number) => {
+    onUpdate?.(name, minutes);
     setIsEditing(false);
   };
 
   const handleCancelEdit = () => {
-    setEditedTask(task);
-    setEditedDuration(String(durationMinutes));
     setIsEditing(false);
   };
 
@@ -122,39 +102,13 @@ export default function ActiveCard({
       <Text style={styles.taskLabel}>Right now</Text>
 
       {isEditing ? (
-        <View style={styles.editSection}>
-          <TextInput
-            style={styles.editInput}
-            value={editedTask}
-            onChangeText={setEditedTask}
-            autoCapitalize="sentences"
-            multiline={true}
-            numberOfLines={2}
-          />
-          <View style={styles.editTimeRow}>
-            <TextInput
-              style={styles.editTimeInput}
-              value={editedDuration}
-              onChangeText={setEditedDuration}
-              keyboardType="number-pad"
-            />
-            <Text style={styles.editTimeSuffix}>min</Text>
-          </View>
-          <View style={styles.editActions}>
-            <Pressable
-              style={[styles.editButton, styles.editButtonOutline]}
-              onPress={handleCancelEdit}
-            >
-              <Text style={styles.editButtonOutlineText}>Cancel</Text>
-            </Pressable>
-            <Pressable
-              style={[styles.editButton, styles.editButtonFilled]}
-              onPress={handleSaveEdit}
-            >
-              <Text style={styles.editButtonFilledText}>Save</Text>
-            </Pressable>
-          </View>
-        </View>
+        <CreateTaskForm
+          initialTaskName={task}
+          initialDuration={durationMinutes}
+          onSubmit={handleSaveEdit}
+          onCancel={handleCancelEdit}
+          showCard={false}
+        />
       ) : (
         <Text style={styles.taskText}>{task}</Text>
       )}
@@ -471,68 +425,4 @@ const styles = StyleSheet.create({
     color: AppColors.Ink,
   },
 
-  // Edit mode
-  editSection: {
-    marginBottom: 20,
-  },
-  editInput: {
-    backgroundColor: AppColors.White,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: AppColors.TextDark,
-    borderWidth: 1,
-    borderColor: AppColors.LightGray,
-    marginBottom: 12,
-  },
-  editTimeRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: AppColors.White,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderWidth: 1,
-    borderColor: AppColors.LightGray,
-  },
-  editTimeInput: {
-    flex: 1,
-    fontSize: 16,
-    color: AppColors.TextDark,
-    paddingVertical: 0,
-  },
-  editTimeSuffix: {
-    fontSize: 14,
-    color: AppColors.MutedGray,
-    marginLeft: 8,
-  },
-  editActions: {
-    flexDirection: "row",
-    gap: 12,
-    marginTop: 16,
-  },
-  editButton: {
-    flex: 1,
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: "center",
-  },
-  editButtonOutline: {
-    borderWidth: 1,
-    borderColor: AppColors.BorderGray,
-  },
-  editButtonOutlineText: {
-    fontSize: 16,
-    color: AppColors.Ink,
-    fontWeight: "600",
-  },
-  editButtonFilled: {
-    backgroundColor: AppColors.TextDark,
-  },
-  editButtonFilledText: {
-    fontSize: 16,
-    color: AppColors.White,
-    fontWeight: "600",
-  },
 });
