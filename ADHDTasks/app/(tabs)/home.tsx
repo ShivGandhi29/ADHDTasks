@@ -14,6 +14,7 @@ import ActiveCard from "../components/active-card";
 import InactiveCard from "../components/inactive-card";
 import {
   addHistoryTask,
+  addTask,
   clearActiveTask,
   getActiveTask,
   getTasks,
@@ -71,6 +72,15 @@ export default function HomeScreen() {
   };
 
   const activateInactiveTask = async (task: TaskItem) => {
+    if (activeTask) {
+      const previousActive: TaskItem = {
+        id: `${Date.now()}`,
+        name: activeTask.task,
+        durationMinutes: activeTask.durationMinutes,
+        createdAt: new Date().toISOString(),
+      };
+      await addTask(previousActive);
+    }
     setActiveTask({ task: task.name, durationMinutes: task.durationMinutes });
     await setActiveTaskStorage(task);
     await removeTask(task.id);
@@ -258,7 +268,8 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   header: {
-    marginBottom: 4,
+    marginTop: 14,
+    marginBottom: 14,
   },
   greeting: {
     fontSize: 32,

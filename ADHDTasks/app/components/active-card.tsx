@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { ScrollView, View, Text, Pressable, StyleSheet } from "react-native";
 import { CountdownCircleTimer } from "react-native-countdown-circle-timer";
 import { AppColors } from "./ui/ThemeColors";
 
@@ -72,73 +72,75 @@ export default function ActiveCard({
 
   return (
     <View style={[styles.card, isRunning && styles.cardFullScreen]}>
-      <Text style={styles.taskLabel}>Right now</Text>
+      <ScrollView
+        contentContainerStyle={[
+          styles.cardContent,
+          isRunning && styles.cardContentFullScreen,
+        ]}
+        scrollEnabled={isRunning}
+        showsVerticalScrollIndicator={false}
+      >
+        <Text style={styles.taskLabel}>Right now</Text>
 
-      <Text style={styles.taskText}>{task}</Text>
+        <Text style={styles.taskText}>{task}</Text>
 
-      {isRunning && (
-        <View style={styles.timerWrapper}>
-          <CountdownCircleTimer
-            key={timerKey}
-            isPlaying={!isPaused}
-            duration={durationSeconds}
-            initialRemainingTime={remainingSeconds}
-            colors={[AppColors.TextDark, AppColors.SlateGray, AppColors.AccentRed]}
-            colorsTime={[durationSeconds, Math.max(2, durationSeconds * 0.3), 0]}
-            strokeWidth={10}
-            size={180}
-            updateInterval={1}
-            onUpdate={(remainingTime) => setRemainingSeconds(remainingTime)}
-            onComplete={() => {
-              handleComplete();
-              return { shouldRepeat: false };
-            }}
+        {isRunning && (
+          <View style={styles.timerWrapper}>
+            <CountdownCircleTimer
+              key={timerKey}
+              isPlaying={!isPaused}
+              duration={durationSeconds}
+              initialRemainingTime={remainingSeconds}
+              colors={[AppColors.TextDark, AppColors.SlateGray, AppColors.AccentRed]}
+              colorsTime={[durationSeconds, Math.max(2, durationSeconds * 0.3), 0]}
+              strokeWidth={10}
+              size={300}
+              updateInterval={1}
+              onUpdate={(remainingTime) => setRemainingSeconds(remainingTime)}
+              onComplete={() => {
+                handleComplete();
+                return { shouldRepeat: false };
+              }}
+            >
+              {({ remainingTime }) => (
+                <Text style={styles.timerText}>{formatTime(remainingTime)}</Text>
+              )}
+            </CountdownCircleTimer>
+          </View>
+        )}
+
+        {(!isRunning || isPaused) && (
+          <Pressable style={styles.primaryButton} onPress={onStart}>
+            <Text style={styles.primaryButtonText}>
+              {isPaused ? "Resume" : `Start ${durationMinutes} minutes`}
+            </Text>
+          </Pressable>
+        )}
+
+        <View style={styles.actionRow}>
+          <Pressable
+            style={[styles.secondaryButton, isPaused && styles.secondaryActive]}
+            onPress={onPause}
+            disabled={!isRunning}
           >
-            {({ remainingTime }) => (
-              <Text style={styles.timerText}>{formatTime(remainingTime)}</Text>
-            )}
-          </CountdownCircleTimer>
+            <Text style={styles.secondaryButtonText}>
+              {isPaused ? "Paused" : "Pause"}
+            </Text>
+          </Pressable>
+          <Pressable
+            style={styles.secondaryButton}
+            onPress={handleComplete}
+            disabled={!isRunning && remainingSeconds === 0}
+          >
+            <Text style={styles.secondaryButtonText}>Complete</Text>
+          </Pressable>
+          <Pressable style={styles.secondaryButton} onPress={handleCancel}>
+            <Text style={styles.secondaryButtonText}>Cancel</Text>
+          </Pressable>
         </View>
-      )}
 
-      {(!isRunning || isPaused) && (
-        <Pressable style={styles.primaryButton} onPress={onStart}>
-          <Text style={styles.primaryButtonText}>
-            {isPaused ? "Resume" : `Start ${durationMinutes} minutes`}
-          </Text>
-        </Pressable>
-      )}
-
-
-
-      <View style={styles.actionRow}>
-        <Pressable
-          style={[styles.secondaryButton, isPaused && styles.secondaryActive]}
-          onPress={onPause}
-          disabled={!isRunning}
-        >
-          <Text style={styles.secondaryButtonText}>
-            {isPaused ? "Paused" : "Pause"}
-          </Text>
-        </Pressable>
-        <Pressable
-          style={styles.secondaryButton}
-          onPress={handleComplete}
-          disabled={!isRunning && remainingSeconds === 0}
-        >
-          <Text style={styles.secondaryButtonText}>Complete</Text>
-        </Pressable>
-        <Pressable style={styles.secondaryButton} onPress={handleCancel}>
-          <Text style={styles.secondaryButtonText}>Cancel</Text>
-        </Pressable>
-      </View>
-
-      <Text style={styles.reassurance}>Focus!!!</Text>
-
-
-
-
-
+        <Text style={styles.reassurance}>Focus!!!</Text>
+      </ScrollView>
     </View>
   );
 }
@@ -147,7 +149,6 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: AppColors.White,
     borderRadius: 20,
-    padding: 44,
     shadowColor: AppColors.Black,
     shadowOpacity: 0.08,
     shadowRadius: 12,
@@ -158,9 +159,10 @@ const styles = StyleSheet.create({
   timerWrapper: {
     alignItems: "center",
     marginBottom: 20,
+    marginTop: 10,
   },
   timerText: {
-    fontSize: 22,
+    fontSize: 36,
     color: AppColors.TextDark,
     fontWeight: "600",
   },
@@ -168,12 +170,17 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "100%",
     borderRadius: 0,
-    paddingHorizontal: 32,
-    paddingVertical: 48,
     shadowOpacity: 0,
     shadowRadius: 0,
     shadowOffset: { width: 0, height: 0 },
     elevation: 0,
+  },
+  cardContent: {
+    padding: 44,
+  },
+  cardContentFullScreen: {
+    paddingHorizontal: 32,
+    paddingVertical: 48,
   },
   taskLabel: {
     fontSize: 14,
