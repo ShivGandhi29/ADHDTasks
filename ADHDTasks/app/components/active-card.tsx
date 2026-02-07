@@ -33,6 +33,7 @@ export default function ActiveCard({
   const [remainingSeconds, setRemainingSeconds] = useState(durationSeconds);
   const [timerKey, setTimerKey] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
+  const [isTimesUp, setIsTimesUp] = useState(false);
   const [editedTask, setEditedTask] = useState(task);
   const [editedDuration, setEditedDuration] = useState(String(durationMinutes));
 
@@ -69,11 +70,27 @@ export default function ActiveCard({
     setIsPaused(true);
   };
 
+  const handleTimesUp = () => {
+    setIsRunning(false);
+    setIsPaused(false);
+    setRemainingSeconds(0);
+    setIsTimesUp(true);
+  };
+
   const handleComplete = () => {
+    setIsTimesUp(false);
     setIsRunning(false);
     setIsPaused(false);
     setRemainingSeconds(0);
     onComplete?.();
+  };
+
+  const handleExtend = (extraMinutes: number) => {
+    setIsTimesUp(false);
+    setRemainingSeconds(extraMinutes * 60);
+    setTimerKey((current) => current + 1);
+    setIsRunning(true);
+    setIsPaused(false);
   };
 
   const handleCancel = () => {
@@ -156,7 +173,7 @@ export default function ActiveCard({
             updateInterval={1}
             onUpdate={(remainingTime) => setRemainingSeconds(remainingTime)}
             onComplete={() => {
-              handleComplete();
+              handleTimesUp();
               return { shouldRepeat: false };
             }}
           >
@@ -167,7 +184,34 @@ export default function ActiveCard({
         </View>
       )}
 
-      {(!isRunning || isPaused) && !isEditing && (
+      {isTimesUp && (
+        <View style={styles.timesUpSection}>
+          <Text style={styles.timesUpEmoji}>&#127881;</Text>
+          <Text style={styles.timesUpTitle}>Time's up!</Text>
+          <Text style={styles.timesUpSubtitle}>
+            Great focus session. What would you like to do?
+          </Text>
+
+          <Pressable style={styles.completeButton} onPress={handleComplete}>
+            <Text style={styles.completeButtonText}>Mark as complete</Text>
+          </Pressable>
+
+          <Text style={styles.extendLabel}>Need more time?</Text>
+          <View style={styles.extendRow}>
+            {[2, 5, 10].map((mins) => (
+              <Pressable
+                key={mins}
+                style={styles.extendChip}
+                onPress={() => handleExtend(mins)}
+              >
+                <Text style={styles.extendChipText}>+{mins} min</Text>
+              </Pressable>
+            ))}
+          </View>
+        </View>
+      )}
+
+      {!isTimesUp && (!isRunning || isPaused) && !isEditing && (
         <View style={styles.startSection}>
           <Text style={styles.startMeta}>
             {isPaused
@@ -182,7 +226,7 @@ export default function ActiveCard({
         </View>
       )}
 
-      {!isRunning && !isPaused && !isEditing && (
+      {!isTimesUp && !isRunning && !isPaused && !isEditing && (
         <Pressable
           style={styles.editTrigger}
           onPress={() => setIsEditing(true)}
@@ -215,7 +259,7 @@ export default function ActiveCard({
         </View>
       )}
 
-      {!isEditing && (
+      {!isEditing && !isTimesUp && (
         <Text style={styles.reassurance}>
           {isRunning ? "You've got this." : "Starting is enough."}
         </Text>
@@ -368,6 +412,63 @@ const styles = StyleSheet.create({
     color: AppColors.SlateGray,
     textAlign: "center",
     marginTop: 16,
+  },
+
+  // Time's up
+  timesUpSection: {
+    alignItems: "center",
+    paddingVertical: 8,
+  },
+  timesUpEmoji: {
+    fontSize: 48,
+    marginBottom: 8,
+  },
+  timesUpTitle: {
+    fontSize: 28,
+    fontWeight: "700",
+    color: AppColors.TextDark,
+    marginBottom: 8,
+  },
+  timesUpSubtitle: {
+    fontSize: 15,
+    color: AppColors.SlateGray,
+    textAlign: "center",
+    marginBottom: 24,
+    lineHeight: 22,
+  },
+  completeButton: {
+    backgroundColor: AppColors.TextDark,
+    paddingVertical: 20,
+    borderRadius: 16,
+    alignItems: "center",
+    width: "100%",
+    marginBottom: 24,
+  },
+  completeButtonText: {
+    color: AppColors.White,
+    fontSize: 20,
+    fontWeight: "700",
+  },
+  extendLabel: {
+    fontSize: 14,
+    color: AppColors.MutedGray,
+    marginBottom: 12,
+  },
+  extendRow: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  extendChip: {
+    borderWidth: 1,
+    borderColor: AppColors.BorderGray,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+  },
+  extendChipText: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: AppColors.Ink,
   },
 
   // Edit mode

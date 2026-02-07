@@ -136,6 +136,18 @@ export default function HomeScreen() {
     router.navigate("/(tabs)/history");
   };
 
+  const handleUpdateActive = async (name: string, durationMinutes: number) => {
+    if (!activeTask) return;
+    const updated: TaskItem = {
+      id: activeTask.task + durationMinutes,
+      name,
+      durationMinutes,
+      createdAt: new Date().toISOString(),
+    };
+    setActiveTask({ task: name, durationMinutes });
+    await setActiveTaskStorage(updated);
+  };
+
   const handleCreateActive = async () => {
     const trimmedName = draftTaskName.trim();
     const parsedMinutes = Number(draftDurationMinutes);
@@ -176,6 +188,7 @@ export default function HomeScreen() {
               onRunningChange={setIsActiveRunning}
               onCancel={handleFinishActive}
               onComplete={handleFinishActive}
+              onUpdate={handleUpdateActive}
             />
           </View>
         ) : (
