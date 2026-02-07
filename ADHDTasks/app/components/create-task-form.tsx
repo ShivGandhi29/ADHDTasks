@@ -96,7 +96,7 @@ export default function CreateTaskForm({
       </View>
 
       <View style={styles.chipRow}>
-        {["5", "10", "15", "25"].map((value) => (
+        {["5", "10", "15", "30", "60"].map((value) => (
           <Pressable
             key={value}
             style={[
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: AppColors.LightGray,
     backgroundColor: AppColors.White,
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     paddingVertical: 10,
     borderRadius: 999,
   },

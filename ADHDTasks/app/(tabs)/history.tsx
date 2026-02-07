@@ -61,7 +61,7 @@ export default function History() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: AppColors.OffWhite,
+    backgroundColor: AppColors.White,
   },
   content: {
     padding: 24,

@@ -10,7 +10,7 @@ export default function TabLayout() {
       <NativeTabs>
         <NativeTabs.Trigger name="home">
           <Label>Now</Label>
-          <Icon sf="house.fill" />
+          <Icon sf="bolt.fill" />
         </NativeTabs.Trigger>
         <NativeTabs.Trigger name="newTask" role="search">
           <Label>Add</Label>
@@ -18,7 +18,7 @@ export default function TabLayout() {
         </NativeTabs.Trigger>
         <NativeTabs.Trigger name="history">
           <Label>History</Label>
-          <Icon sf="paperplane.fill" />
+          <Icon sf="clock.arrow.circlepath" />
         </NativeTabs.Trigger>
         <NativeTabs.Trigger name="settings">
           <Label>Settings</Label>
@@ -35,7 +35,7 @@ export default function TabLayout() {
         options={{
           title: "Now",
           tabBarIcon: ({ color, size }) => (
-            <IconSymbol name="house.fill" color={color} size={size} />
+            <IconSymbol name="bolt.fill" color={color} size={size} />
           ),
           headerShown: false,
         }}
@@ -43,7 +43,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="newTask"
         options={{
-          title: "Add",
+          title: "Add Task",
           tabBarIcon: ({ color, size }) => (
             <IconSymbol name="plus" color={color} size={size} />
           ),
@@ -55,7 +55,7 @@ export default function TabLayout() {
         options={{
           title: "History",
           tabBarIcon: ({ color, size }) => (
-            <IconSymbol name="paperplane.fill" color={color} size={size} />
+            <IconSymbol name="clock.arrow.circlepath" color={color} size={size} />
           ),
           headerShown: false,
         }}

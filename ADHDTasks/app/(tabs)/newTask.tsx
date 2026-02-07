@@ -63,8 +63,8 @@ export default function NewTask() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: AppColors.OffWhite,
-    padding: 24,
+    backgroundColor: AppColors.White,
+    padding: 16,
     //justifyContent: "center",
   },
 });
