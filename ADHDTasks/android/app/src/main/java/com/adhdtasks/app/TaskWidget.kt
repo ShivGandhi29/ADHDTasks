@@ -28,31 +28,40 @@ class TaskWidget : AppWidgetProvider() {
                     val isRunning = json.optBoolean("isRunning", false)
 
                     views.setTextViewText(R.id.tvTaskName, name)
-                    views.setTextViewText(R.id.tvStatus, if (isRunning) "RUNNING" else "READY")
+                    views.setTextViewText(
+                        R.id.tvStatus,
+                        if (isRunning) "\u25CF RUNNING" else "\u25CB READY"
+                    )
+                    views.setTextColor(
+                        R.id.tvStatus,
+                        if (isRunning) 0xFF4CAF50.toInt() else 0xFFFF9800.toInt()
+                    )
                     views.setTextViewText(R.id.tvDuration, formatDuration(durationMinutes))
                 } catch (e: Exception) {
-                    views.setTextViewText(R.id.tvTaskName, "No active task")
-                    views.setTextViewText(R.id.tvStatus, "")
-                    views.setTextViewText(R.id.tvDuration, "")
+                    setEmptyState(views)
                 }
             } else {
-                views.setTextViewText(R.id.tvTaskName, "No active task")
-                views.setTextViewText(R.id.tvStatus, "")
-                views.setTextViewText(R.id.tvDuration, "Tap to open app")
+                setEmptyState(views)
             }
 
-            // Tap to open app
+            // Tap anywhere to open app
             val launchIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
             if (launchIntent != null) {
                 val pendingIntent = PendingIntent.getActivity(
                     context, 0, launchIntent,
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                 )
-                views.setOnClickPendingIntent(R.id.tvTaskName, pendingIntent)
+                views.setOnClickPendingIntent(R.id.widgetRoot, pendingIntent)
             }
 
             appWidgetManager.updateAppWidget(widgetId, views)
         }
+    }
+
+    private fun setEmptyState(views: RemoteViews) {
+        views.setTextViewText(R.id.tvTaskName, "No active task")
+        views.setTextViewText(R.id.tvStatus, "")
+        views.setTextViewText(R.id.tvDuration, "Tap to open app")
     }
 
     private fun formatDuration(minutes: Int): String {
