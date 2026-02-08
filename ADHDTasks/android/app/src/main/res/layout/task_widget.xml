@@ -38,4 +38,14 @@
         android:textSize="13sp"
         android:textColor="#666666" />
 
+    <Chronometer
+        android:id="@+id/chronometer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="#111111"
+        android:visibility="gone" />
+
 </RelativeLayout>

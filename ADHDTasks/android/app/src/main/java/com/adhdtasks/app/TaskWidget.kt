@@ -5,6 +5,8 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
+import android.os.SystemClock
+import android.view.View
 import android.widget.RemoteViews
 import org.json.JSONObject
 
@@ -26,6 +28,7 @@ class TaskWidget : AppWidgetProvider() {
                     val name = json.optString("name", "No task")
                     val durationMinutes = json.optInt("durationMinutes", 0)
                     val isRunning = json.optBoolean("isRunning", false)
+                    val endTimeMs = json.optLong("endTime", 0L)
 
                     views.setTextViewText(R.id.tvTaskName, name)
                     views.setTextViewText(
@@ -36,7 +39,21 @@ class TaskWidget : AppWidgetProvider() {
                         R.id.tvStatus,
                         if (isRunning) 0xFF4CAF50.toInt() else 0xFFFF9800.toInt()
                     )
-                    views.setTextViewText(R.id.tvDuration, formatDuration(durationMinutes))
+
+                    if (isRunning && endTimeMs > System.currentTimeMillis()) {
+                        // Live countdown using Chronometer
+                        val remainingMs = endTimeMs - System.currentTimeMillis()
+                        val base = SystemClock.elapsedRealtime() + remainingMs
+                        views.setChronometer(R.id.chronometer, base, null, true)
+                        views.setChronometerCountDown(R.id.chronometer, true)
+                        views.setViewVisibility(R.id.chronometer, View.VISIBLE)
+                        views.setViewVisibility(R.id.tvDuration, View.GONE)
+                    } else {
+                        // Static duration
+                        views.setViewVisibility(R.id.chronometer, View.GONE)
+                        views.setViewVisibility(R.id.tvDuration, View.VISIBLE)
+                        views.setTextViewText(R.id.tvDuration, formatDuration(durationMinutes))
+                    }
                 } catch (e: Exception) {
                     setEmptyState(views)
                 }
@@ -61,6 +78,8 @@ class TaskWidget : AppWidgetProvider() {
     private fun setEmptyState(views: RemoteViews) {
         views.setTextViewText(R.id.tvTaskName, "No active task")
         views.setTextViewText(R.id.tvStatus, "")
+        views.setViewVisibility(R.id.chronometer, View.GONE)
+        views.setViewVisibility(R.id.tvDuration, View.VISIBLE)
         views.setTextViewText(R.id.tvDuration, "Tap to open app")
     }
 

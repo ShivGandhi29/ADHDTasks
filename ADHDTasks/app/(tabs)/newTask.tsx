@@ -55,7 +55,7 @@ export default function NewTask() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <CreateTaskForm onSubmit={handleAddTask} submitLabel="Add task" />
+      <CreateTaskForm onSubmit={handleAddTask} submitLabel="Add Task" />
     </SafeAreaView>
   );
 }

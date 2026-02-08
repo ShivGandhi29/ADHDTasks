@@ -29,7 +29,6 @@ export default function CreateTaskForm({
   const [durationMinutes, setDurationMinutes] = useState(
     initialDuration ? String(initialDuration) : ""
   );
-  const maxTaskLines = 5;
   const isEditMode = Boolean(onCancel);
 
   // Sync with external prop changes (e.g. when the parent task changes)
@@ -65,7 +64,7 @@ export default function CreateTaskForm({
 
       <Text style={styles.fieldLabel}>Task name</Text>
       <TextInput
-        style={styles.input}
+        style={styles.taskNameInput}
         placeholder="What do you need to do?"
         placeholderTextColor={AppColors.MutedGray}
         value={taskName}
@@ -175,17 +174,14 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     letterSpacing: 0.5,
   },
-  input: {
-    backgroundColor: AppColors.OffWhite,
-    borderRadius: 14,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 17,
+  taskNameInput: {
+    backgroundColor: "transparent",
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+    fontSize: 20,
     color: AppColors.TextDark,
-    borderWidth: 1.5,
-    borderColor: AppColors.LightGray,
-    marginBottom: 20,
-    lineHeight: 24,
+    marginBottom: 40,
+fontWeight: "700",    //minHeight: 24,
   },
   timeRow: {
     flexDirection: "row",

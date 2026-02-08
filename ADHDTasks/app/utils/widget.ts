@@ -21,13 +21,16 @@ export function syncWidgetWithTask(
     return;
   }
 
+  const isRunning = options?.isRunning ?? false;
+  const remaining = options?.remainingSeconds ?? task.durationMinutes * 60;
+
   const payload = JSON.stringify({
     name: task.name,
     durationMinutes: task.durationMinutes,
-    isRunning: options?.isRunning ?? false,
-    remainingSeconds:
-      options?.remainingSeconds ?? task.durationMinutes * 60,
-    startedAt: options?.isRunning ? Date.now() : null,
+    isRunning,
+    remainingSeconds: remaining,
+    startedAt: isRunning ? Date.now() : null,
+    endTime: isRunning ? Date.now() + remaining * 1000 : null,
   });
 
   if (Platform.OS === "ios") {

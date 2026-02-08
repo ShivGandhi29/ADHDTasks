@@ -27,7 +27,7 @@ export default function HomeScreen() {
   } | null>(null);
 
   const handleRunningChange = useCallback(
-    (running: boolean) => {
+    (running: boolean, remainingSeconds: number) => {
       setIsActiveRunning(running);
       if (activeTask) {
         syncWidgetWithTask(
@@ -37,7 +37,7 @@ export default function HomeScreen() {
             durationMinutes: activeTask.durationMinutes,
             createdAt: "",
           },
-          { isRunning: running }
+          { isRunning: running, remainingSeconds }
         );
       }
     },
@@ -198,7 +198,7 @@ export default function HomeScreen() {
         ) : (
           <CreateTaskForm
             onSubmit={handleCreateActive}
-            submitLabel="Start task"
+            submitLabel="Add Task"
           />
         )}
         {!isActiveRunning && inactiveTasks.length > 0 && (

@@ -7,7 +7,7 @@ import CreateTaskForm from "./create-task-form";
 type ActiveCardProps = {
   task: string;
   durationMinutes?: number;
-  onRunningChange?: (isRunning: boolean) => void;
+  onRunningChange?: (isRunning: boolean, remainingSeconds: number) => void;
   onCancel?: () => void;
   onComplete?: () => void;
   onUpdate?: (task: string, durationMinutes: number) => void;
@@ -30,8 +30,12 @@ export default function ActiveCard({
   const [isTimesUp, setIsTimesUp] = useState(false);
 
   useEffect(() => {
-    onRunningChange?.(isRunning);
-  }, [isRunning, onRunningChange]);
+    // Notify parent when running/paused state changes (not every second tick).
+    // isRunning && !isPaused = actively counting down (widget shows live timer).
+    // isPaused or !isRunning = stopped (widget shows static state).
+    const isActivelyRunning = isRunning && !isPaused;
+    onRunningChange?.(isActivelyRunning, remainingSeconds);
+  }, [isRunning, isPaused, onRunningChange]);
 
   useEffect(() => {
     setRemainingSeconds(durationSeconds);
