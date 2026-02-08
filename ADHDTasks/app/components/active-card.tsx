@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { ScrollView, View, Text, Pressable, StyleSheet } from "react-native";
 import { CountdownCircleTimer } from "react-native-countdown-circle-timer";
+import { playTimerEndAlarm } from "../utils/timer-alarm";
 import { AppColors } from "./ui/ThemeColors";
 import CreateTaskForm from "./create-task-form";
 
@@ -62,6 +63,7 @@ export default function ActiveCard({
   };
 
   const handleTimesUp = () => {
+    playTimerEndAlarm();
     setIsRunning(false);
     setIsPaused(false);
     setRemainingSeconds(0);
