@@ -1,10 +1,11 @@
 {
   "expo": {
-    "name": "ADHDTasks",
-    "slug": "adhd-task-organisation",
+    "name": "Lock In",
+    "slug": "lockin",
+    "description": "Your ADHD to-do list. One task at a time.",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/iconComposer/logo-iOS-Default-1024x1024@2x.png",
     "scheme": "adhdtasks",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -15,9 +16,7 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "foregroundImage": "./assets/images/icon/logo-android.png"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
@@ -32,7 +31,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/icon/logo.icon",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",
