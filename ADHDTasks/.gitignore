@@ -39,6 +39,18 @@ yarn-error.*
 
 app-example
 
-# generated native folders
-/ios
-/android
+# generated native folders — tracked because of custom widget native code
+# /ios
+# /android
+
+# Still ignore generated/cached native build artifacts
+ios/Pods/
+ios/build/
+ios/.xcode.env.local
+ios/ADHDTasks.xcworkspace/xcuserdata/
+ios/ADHDTasks.xcodeproj/xcuserdata/
+ios/ADHDTasks.xcodeproj/project.xcworkspace/xcuserdata/
+android/.gradle/
+android/app/.cxx/
+android/app/build/
+android/build/

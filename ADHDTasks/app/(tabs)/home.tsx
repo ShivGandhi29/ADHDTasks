@@ -15,11 +15,34 @@ import {
   setActiveTask as setActiveTaskStorage,
   TaskItem,
 } from "../data/tasks";
+import { syncWidgetWithTask } from "../utils/widget";
 import { AppColors } from "../components/ui/ThemeColors";
 
 export default function HomeScreen() {
   const [inactiveTasks, setInactiveTasks] = useState<TaskItem[]>([]);
   const [isActiveRunning, setIsActiveRunning] = useState(false);
+  const [activeTask, setActiveTask] = useState<{
+    task: string;
+    durationMinutes: number;
+  } | null>(null);
+
+  const handleRunningChange = useCallback(
+    (running: boolean) => {
+      setIsActiveRunning(running);
+      if (activeTask) {
+        syncWidgetWithTask(
+          {
+            id: "",
+            name: activeTask.task,
+            durationMinutes: activeTask.durationMinutes,
+            createdAt: "",
+          },
+          { isRunning: running }
+        );
+      }
+    },
+    [activeTask]
+  );
   const router = useRouter();
   const greeting = useMemo(() => {
     const hour = new Date().getHours();
@@ -27,16 +50,13 @@ export default function HomeScreen() {
     if (hour < 18) return "Good afternoon";
     return "Good evening";
   }, []);
-  const [activeTask, setActiveTask] = useState<{
-    task: string;
-    durationMinutes: number;
-  } | null>(null);
 
   const loadTasks = useCallback(async () => {
     const [tasks, active] = await Promise.all([getTasks(), getActiveTask()]);
     setInactiveTasks(tasks);
     if (active) {
       setActiveTask({ task: active.name, durationMinutes: active.durationMinutes });
+      syncWidgetWithTask(active);
     } else {
       setActiveTask(null);
     }
@@ -169,7 +189,7 @@ export default function HomeScreen() {
             <ActiveCard
               task={activeTask.task}
               durationMinutes={activeTask.durationMinutes}
-              onRunningChange={setIsActiveRunning}
+              onRunningChange={handleRunningChange}
               onCancel={handleFinishActive}
               onComplete={handleFinishActive}
               onUpdate={handleUpdateActive}

@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { syncWidgetWithTask, clearWidget } from "../utils/widget";
 
 export type TaskItem = {
   id: string;
@@ -67,10 +68,12 @@ export async function getActiveTask(): Promise<TaskItem | null> {
 
 export async function setActiveTask(task: TaskItem): Promise<void> {
   await AsyncStorage.setItem(ACTIVE_TASK_STORAGE_KEY, JSON.stringify(task));
+  syncWidgetWithTask(task);
 }
 
 export async function clearActiveTask(): Promise<void> {
   await AsyncStorage.removeItem(ACTIVE_TASK_STORAGE_KEY);
+  clearWidget();
 }
 
 export default function TasksScreen() {

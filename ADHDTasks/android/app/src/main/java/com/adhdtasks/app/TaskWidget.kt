@@ -1,0 +1,67 @@
+package com.adhdtasks.app
+
+import android.app.PendingIntent
+import android.appwidget.AppWidgetManager
+import android.appwidget.AppWidgetProvider
+import android.content.Context
+import android.content.Intent
+import android.widget.RemoteViews
+import org.json.JSONObject
+
+class TaskWidget : AppWidgetProvider() {
+    override fun onUpdate(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetIds: IntArray
+    ) {
+        val prefs = context.getSharedPreferences("WidgetPrefs", Context.MODE_PRIVATE)
+        val jsonString = prefs.getString("widgetTaskData", null)
+
+        appWidgetIds.forEach { widgetId ->
+            val views = RemoteViews(context.packageName, R.layout.task_widget)
+
+            if (jsonString != null) {
+                try {
+                    val json = JSONObject(jsonString)
+                    val name = json.optString("name", "No task")
+                    val durationMinutes = json.optInt("durationMinutes", 0)
+                    val isRunning = json.optBoolean("isRunning", false)
+
+                    views.setTextViewText(R.id.tvTaskName, name)
+                    views.setTextViewText(R.id.tvStatus, if (isRunning) "RUNNING" else "READY")
+                    views.setTextViewText(R.id.tvDuration, formatDuration(durationMinutes))
+                } catch (e: Exception) {
+                    views.setTextViewText(R.id.tvTaskName, "No active task")
+                    views.setTextViewText(R.id.tvStatus, "")
+                    views.setTextViewText(R.id.tvDuration, "")
+                }
+            } else {
+                views.setTextViewText(R.id.tvTaskName, "No active task")
+                views.setTextViewText(R.id.tvStatus, "")
+                views.setTextViewText(R.id.tvDuration, "Tap to open app")
+            }
+
+            // Tap to open app
+            val launchIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
+            if (launchIntent != null) {
+                val pendingIntent = PendingIntent.getActivity(
+                    context, 0, launchIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+                views.setOnClickPendingIntent(R.id.tvTaskName, pendingIntent)
+            }
+
+            appWidgetManager.updateAppWidget(widgetId, views)
+        }
+    }
+
+    private fun formatDuration(minutes: Int): String {
+        if (minutes <= 0) return ""
+        if (minutes >= 60) {
+            val hrs = minutes / 60
+            val mins = minutes % 60
+            return if (mins > 0) "${hrs}h ${mins}m" else "${hrs}h"
+        }
+        return "$minutes min"
+    }
+}
