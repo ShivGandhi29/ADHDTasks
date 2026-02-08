@@ -1,5 +1,8 @@
 {
-  "fill" : "automatic",
+  "fill" : {
+    "default" : "system-light",
+    "dark" : "system-dark"
+  },
   "groups" : [
     {
       "layers" : [

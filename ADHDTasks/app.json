@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Lock In",
-    "slug": "lockin",
+    "name": "Focusd",
+    "slug": "focusd",
     "description": "Your ADHD to-do list. One task at a time.",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/iconComposer/logo-iOS-Default-1024x1024@2x.png",
+    "icon": "./assets/images/icon/logo.icon",
     "scheme": "adhdtasks",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -15,7 +15,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#ffffff",
         "foregroundImage": "./assets/images/icon/logo-android.png"
       },
       "edgeToEdgeEnabled": true,
