@@ -5,7 +5,7 @@
     "description": "Your ADHD to-do list. One task at a time.",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon/logo.icon",
+    "icon": "./assets/images/iconComposer/logo-iOS-Dark-1024x1024@2x.png",
     "scheme": "adhdtasks",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -16,7 +16,7 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#ffffff",
-        "foregroundImage": "./assets/images/icon/logo-android.png"
+        "foregroundImage": "./assets/images/icon/splash-icon.png"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
@@ -31,8 +31,8 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/icon/logo.icon",
-          "imageWidth": 200,
+          "image": "./assets/images/icon/splash-icon.png",
+          "imageWidth": 120,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",
           "dark": {

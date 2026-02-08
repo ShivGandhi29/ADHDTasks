@@ -1,32 +1,121 @@
 {
-  "fill" : {
-    "default" : "system-light",
-    "dark" : "system-dark"
-  },
+  "fill" : "automatic",
   "groups" : [
     {
+      "hidden" : false,
       "layers" : [
         {
-          "blend-mode" : "hard-light",
-          "fill" : "none",
+          "blend-mode-specializations" : [
+            {
+              "value" : "normal"
+            },
+            {
+              "appearance" : "dark",
+              "value" : "hard-light"
+            }
+          ],
+          "fill" : "automatic",
           "glass" : true,
+          "hidden" : true,
           "image-name" : "logo transparent.png",
           "name" : "logo transparent",
           "position" : {
-            "scale" : 1.2,
+            "scale" : 1.4,
             "translation-in-points" : [
-              1.9296875,
-              -3.203125
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "glass" : false,
+          "image-name" : "focusd.png",
+          "name" : "focusd",
+          "position" : {
+            "scale" : 1.7,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "image-name" : "2.png",
+          "name" : "2",
+          "position" : {
+            "scale" : 1.4,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "fill-specializations" : [
+            {
+              "appearance" : "dark",
+              "value" : "automatic"
+            }
+          ],
+          "image-name" : "4.png",
+          "name" : "4",
+          "position" : {
+            "scale" : 1.4,
+            "translation-in-points" : [
+              0,
+              142.9453125
+            ]
+          }
+        },
+        {
+          "image-name" : "3.png",
+          "name" : "3",
+          "position" : {
+            "scale" : 1.4,
+            "translation-in-points" : [
+              0,
+              -152.9453125
+            ]
+          }
+        },
+        {
+          "blend-mode-specializations" : [
+            {
+              "appearance" : "dark",
+              "value" : "darken"
+            }
+          ],
+          "fill-specializations" : [
+            {
+              "appearance" : "dark",
+              "value" : {
+                "solid" : "extended-gray:0.00000,1.00000"
+              }
+            },
+            {
+              "appearance" : "tinted",
+              "value" : "automatic"
+            }
+          ],
+          "hidden" : true,
+          "image-name" : "BACKGROUND.png",
+          "name" : "BACKGROUND",
+          "position" : {
+            "scale" : 1.7,
+            "translation-in-points" : [
+              0,
+              0
             ]
           }
         }
       ],
+      "lighting" : "individual",
       "shadow" : {
         "kind" : "neutral",
         "opacity" : 0.5
       },
       "translucency" : {
-        "enabled" : true,
+        "enabled" : false,
         "value" : 0.5
       }
     }
