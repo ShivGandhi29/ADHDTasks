@@ -368,7 +368,7 @@ export default function ActiveCard({
             duration={currentDurationSeconds}
             initialRemainingTime={remainingSeconds}
             colors={
-              [colors.text, colors.textSecondary, colors.accentRed] as [
+              [colors.brand, colors.textSecondary, colors.accentRed] as [
                 `#${string}`,
                 `#${string}`,
                 `#${string}`,

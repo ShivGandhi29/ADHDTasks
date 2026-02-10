@@ -60,7 +60,7 @@ const darkPalette: AppPalette = {
   border: "#3D4043",
   borderLight: "#2D3032",
   inputBg: "#222425",
-  brand: "#4DB8E2",
+  brand: "#0A7EA4",
   alert: "#E5484D",
   accentRed: "#FF6B6B",
   appBackground: "#0D1F2D",
