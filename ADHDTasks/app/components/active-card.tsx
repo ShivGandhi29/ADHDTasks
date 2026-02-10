@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { ScrollView, View, Text, Pressable, StyleSheet } from "react-native";
+import { ScrollView, View, Text, TextInput, Pressable, StyleSheet } from "react-native";
 import { CountdownCircleTimer } from "react-native-countdown-circle-timer";
 import { playTimerEndAlarm } from "../utils/timer-alarm";
 import { AppColors } from "./ui/ThemeColors";
@@ -28,6 +28,8 @@ export default function ActiveCard({
   const [remainingSeconds, setRemainingSeconds] = useState(durationSeconds);
   const [timerKey, setTimerKey] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editingNameValue, setEditingNameValue] = useState(task);
   const [isTimesUp, setIsTimesUp] = useState(false);
 
   useEffect(() => {
@@ -42,6 +44,10 @@ export default function ActiveCard({
     setRemainingSeconds(durationSeconds);
     setTimerKey((current) => current + 1);
   }, [durationSeconds]);
+
+  useEffect(() => {
+    if (!isEditingName) setEditingNameValue(task);
+  }, [task, isEditingName]);
 
   const formatTime = (totalSeconds: number) => {
     const minutes = Math.floor(totalSeconds / 60);
@@ -115,8 +121,39 @@ export default function ActiveCard({
           onCancel={handleCancelEdit}
           showCard={false}
         />
+      ) : isEditingName ? (
+        <TextInput
+          style={[styles.taskText, styles.taskNameInput]}
+          value={editingNameValue}
+          onChangeText={setEditingNameValue}
+          placeholder="Task name"
+          placeholderTextColor={AppColors.MutedGray}
+          autoFocus
+          selectTextOnFocus
+          multiline
+          blurOnSubmit
+          returnKeyType="done"
+          onSubmitEditing={() => {
+            const trimmed = editingNameValue.replace(/[\r\n]+/g, " ").trim();
+            if (trimmed) onUpdate?.(trimmed, durationMinutes);
+            setIsEditingName(false);
+          }}
+          onBlur={() => {
+            const trimmed = editingNameValue.replace(/[\r\n]+/g, " ").trim();
+            if (trimmed) onUpdate?.(trimmed, durationMinutes);
+            setIsEditingName(false);
+          }}
+        />
       ) : (
-        <Text style={styles.taskText}>{task}</Text>
+        <Pressable
+          style={styles.taskNameTouchable}
+          onPress={() => {
+            setEditingNameValue(task);
+            setIsEditingName(true);
+          }}
+        >
+          <Text style={styles.taskText}>{task}</Text>
+        </Pressable>
       )}
 
       {isRunning && (
@@ -187,10 +224,7 @@ export default function ActiveCard({
       )}
 
       {!isTimesUp && !isRunning && !isPaused && !isEditing && (
-        <Pressable
-          style={styles.editTrigger}
-          onPress={() => setIsEditing(true)}
-        >
+        <Pressable style={styles.editTrigger} onPress={() => setIsEditing(true)}>
           <Text style={styles.editTriggerText}>Edit task</Text>
         </Pressable>
       )}
@@ -278,12 +312,21 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     letterSpacing: 0.6,
   },
+  taskNameTouchable: {
+    marginBottom: 28,
+  },
   taskText: {
     fontSize: 26,
     fontWeight: "700",
     color: AppColors.TextDark,
-    marginBottom: 28,
     lineHeight: 34,
+  },
+  taskNameInput: {
+    marginBottom: 28,
+    padding: 0,
+    marginVertical: 0,
+    minHeight: 34,
+    textAlignVertical: "top",
   },
 
   // Timer
