@@ -33,6 +33,10 @@ export default function CreateTaskForm({
   const [durationMinutes, setDurationMinutes] = useState(
     initialDuration ? String(initialDuration) : ""
   );
+  const [errors, setErrors] = useState<{
+    taskName?: string;
+    duration?: string;
+  }>({});
   const isEditMode = Boolean(onCancel);
 
   // Sync with external prop changes (e.g. when the parent task changes)
@@ -47,18 +51,49 @@ export default function CreateTaskForm({
   const handleTaskNameChange = (value: string) => {
     // Strip newlines — enter key is blocked, but handle paste too
     setTaskName(value.replace(/[\r\n]+/g, " "));
+    // Clear error when user starts typing
+    if (errors.taskName) {
+      setErrors((prev) => ({ ...prev, taskName: undefined }));
+    }
   };
 
   const handleSubmit = () => {
     const trimmedName = taskName.trim();
-    const parsedMinutes = Number(durationMinutes);
-    if (!trimmedName || !Number.isFinite(parsedMinutes) || parsedMinutes <= 0) {
+    const trimmedDuration = durationMinutes.trim();
+    const parsedMinutes = Number(trimmedDuration);
+    // Use placeholder value (10) as default if no duration provided or invalid
+    const finalMinutes =
+      trimmedDuration && Number.isFinite(parsedMinutes) && parsedMinutes > 0
+        ? parsedMinutes
+        : 10;
+    const newErrors: { taskName?: string; duration?: string } = {};
+
+    if (!trimmedName) {
+      newErrors.taskName = "Oops! You need to enter a task name.";
+    }
+
+    if (finalMinutes > 120) {
+      newErrors.duration = "Maximum duration is 120 minutes! Break this into smaller tasks.";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
-    onSubmit(trimmedName, parsedMinutes);
+
+    setErrors({});
+    onSubmit(trimmedName, finalMinutes);
     if (!isEditMode) {
       setTaskName("");
       setDurationMinutes("");
+    }
+  };
+
+  const handleDurationChange = (value: string) => {
+    setDurationMinutes(value);
+    // Clear error when user starts typing
+    if (errors.duration) {
+      setErrors((prev) => ({ ...prev, duration: undefined }));
     }
   };
 
@@ -93,7 +128,7 @@ export default function CreateTaskForm({
           paddingVertical: 0,
           fontSize: 20,
           color: colors.text,
-          marginBottom: 40,
+          marginBottom:10,
           fontWeight: "700",
         },
         timeRow: {
@@ -178,6 +213,12 @@ export default function CreateTaskForm({
           color: colors.background,
           fontWeight: "600",
         },
+        errorText: {
+          fontSize: 13,
+          color: colors.alert,
+          marginTop: 4,
+          marginBottom: 32,
+        },
       }),
     [colors]
   );
@@ -190,7 +231,10 @@ export default function CreateTaskForm({
 
       <Text style={styles.fieldLabel}>Task name</Text>
       <TextInput
-        style={styles.taskNameInput}
+        style={[
+          styles.taskNameInput,
+          !errors.taskName && { marginBottom: 40 },
+        ]}
         placeholder="What do you need to do?"
         placeholderTextColor={colors.textMuted}
         value={taskName}
@@ -206,6 +250,9 @@ export default function CreateTaskForm({
         }}
         scrollEnabled={false}
       />
+      {errors.taskName && (
+        <Text style={styles.errorText}>{errors.taskName}</Text>
+      )}
 
       <Text style={styles.fieldLabel}>How long will this take?</Text>
       <View style={styles.timeRow}>
@@ -214,12 +261,15 @@ export default function CreateTaskForm({
           placeholder="10"
           placeholderTextColor={colors.textMuted}
           value={durationMinutes}
-          onChangeText={setDurationMinutes}
+          onChangeText={handleDurationChange}
           keyboardType="number-pad"
           returnKeyType="done"
         />
         <Text style={styles.timeSuffix}>minutes</Text>
       </View>
+      {errors.duration && (
+        <Text style={styles.errorText}>{errors.duration}</Text>
+      )}
 
       <View style={styles.chipRow}>
         {["5", "10", "15", "30", "60"].map((value) => (
@@ -229,7 +279,12 @@ export default function CreateTaskForm({
               styles.chip,
               durationMinutes === value && styles.chipActive,
             ]}
-            onPress={() => setDurationMinutes(value)}
+            onPress={() => {
+              setDurationMinutes(value);
+              if (errors.duration) {
+                setErrors((prev) => ({ ...prev, duration: undefined }));
+              }
+            }}
           >
             <Text
               style={[
