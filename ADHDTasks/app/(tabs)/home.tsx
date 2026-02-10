@@ -52,7 +52,7 @@ export default function HomeScreen() {
         contentFullScreen: { padding: 16 },
         activeFullScreen: {},
       }),
-    [colors]
+    [colors],
   );
   const [inactiveTasks, setInactiveTasks] = useState<TaskItem[]>([]);
   const [isActiveRunning, setIsActiveRunning] = useState(false);
@@ -222,7 +222,7 @@ export default function HomeScreen() {
     setActiveTask(null);
     await clearActiveTask();
     await loadTasks();
-    router.navigate("/(tabs)/history");
+    router.navigate("/(tabs)/toDoList");
   };
 
   const handleUpdateActive = async (name: string, durationMinutes: number) => {

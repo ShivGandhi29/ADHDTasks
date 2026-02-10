@@ -37,6 +37,7 @@ export default function ActiveCard({
   const [isEditingName, setIsEditingName] = useState(false);
   const [editingNameValue, setEditingNameValue] = useState(task);
   const [isTimesUp, setIsTimesUp] = useState(false);
+  const [isManuallyCompleted, setIsManuallyCompleted] = useState(false);
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
 
@@ -84,10 +85,25 @@ export default function ActiveCard({
     setIsPaused(false);
     setRemainingSeconds(0);
     setIsTimesUp(true);
+    // Exit any editing modes when task is completed
+    setIsEditing(false);
+    setIsEditingName(false);
+  };
+
+  const handleManualComplete = () => {
+    // No alarm - just stop timer and show completion UI
+    setIsRunning(false);
+    setIsPaused(false);
+    setRemainingSeconds(0);
+    setIsManuallyCompleted(true);
+    // Exit any editing modes when task is completed
+    setIsEditing(false);
+    setIsEditingName(false);
   };
 
   const handleComplete = () => {
     setIsTimesUp(false);
+    setIsManuallyCompleted(false);
     setIsRunning(false);
     setIsPaused(false);
     setRemainingSeconds(0);
@@ -96,6 +112,7 @@ export default function ActiveCard({
 
   const handleExtend = (extraMinutes: number) => {
     setIsTimesUp(false);
+    setIsManuallyCompleted(false);
     setRemainingSeconds(extraMinutes * 60);
     setCurrentDurationSeconds(extraMinutes * 60);
     setTimerKey((current) => current + 1);
@@ -109,6 +126,12 @@ export default function ActiveCard({
     setRemainingSeconds(newRemaining);
     setCurrentDurationSeconds(newRemaining);
     setTimerKey((current) => current + 1);
+    // If manually completed, resume the timer
+    if (isManuallyCompleted) {
+      setIsManuallyCompleted(false);
+      setIsRunning(true);
+      setIsPaused(false);
+    }
   };
 
   const handleCancel = () => {
@@ -136,9 +159,8 @@ export default function ActiveCard({
           borderRadius: 20,
         },
         cardFullScreen: {
-         width: "100%",
+          width: "100%",
           borderRadius: 20,
-          
         },
         cardContent: { padding: 28 },
         cardContentCompact: { paddingTop: 16 },
@@ -322,7 +344,7 @@ export default function ActiveCard({
           onCancel={handleCancelEdit}
           showCard={false}
         />
-      ) : isEditingName ? (
+      ) : isEditingName && !isTimesUp && !isManuallyCompleted ? (
         <TextInput
           style={[styles.taskText, styles.taskNameInput]}
           value={editingNameValue}
@@ -349,15 +371,47 @@ export default function ActiveCard({
         <Pressable
           style={styles.taskNameTouchable}
           onPress={() => {
-            setEditingNameValue(task);
-            setIsEditingName(true);
+            if (!isTimesUp && !isManuallyCompleted) {
+              setEditingNameValue(task);
+              setIsEditingName(true);
+            }
           }}
+          disabled={isTimesUp || isManuallyCompleted}
         >
           <Text style={styles.taskText}>{task}</Text>
         </Pressable>
       )}
 
-      {isRunning && (
+      {isManuallyCompleted && (
+        <View style={styles.timesUpSection}>
+          <Text style={styles.timesUpEmoji}>&#127881;</Text>
+          <Text style={styles.timesUpTitle}>Great work!</Text>
+          <Text style={styles.timesUpSubtitle}>
+            You completed this task. What would you like to do?
+          </Text>
+
+          <Pressable style={styles.completeButton} onPress={handleComplete}>
+            <Text style={styles.completeButtonText}>Continue</Text>
+          </Pressable>
+
+          <View style={styles.needMoreTimeSection}>
+            <Text style={styles.needMoreTimeLabel}>Need more time?</Text>
+            <View style={styles.needMoreTimeRow}>
+              {[5, 10, 15, 30].map((mins) => (
+                <Pressable
+                  key={mins}
+                  style={styles.needMoreTimeChip}
+                  onPress={() => handleAddTime(mins)}
+                >
+                  <Text style={styles.needMoreTimeChipText}>+{mins}m</Text>
+                </Pressable>
+              ))}
+            </View>
+          </View>
+        </View>
+      )}
+
+      {isRunning && !isManuallyCompleted && (
         <View style={styles.timerWrapper}>
           <CountdownCircleTimer
             key={timerKey}
@@ -401,7 +455,7 @@ export default function ActiveCard({
           </Text>
 
           <Pressable style={styles.completeButton} onPress={handleComplete}>
-            <Text style={styles.completeButtonText}>Mark as complete</Text>
+            <Text style={styles.completeButtonText}>Mark as Complete</Text>
           </Pressable>
 
           <Text style={styles.extendLabel}>Need more time?</Text>
@@ -419,7 +473,7 @@ export default function ActiveCard({
         </View>
       )}
 
-      {!isTimesUp && (!isRunning || isPaused) && !isEditing && (
+      {!isTimesUp && !isManuallyCompleted && (!isRunning || isPaused) && !isEditing && (
         <View style={styles.startSection}>
           <Text style={styles.startMeta}>
             {isPaused
@@ -434,7 +488,7 @@ export default function ActiveCard({
         </View>
       )}
 
-      {!isTimesUp && !isRunning && !isPaused && !isEditing && (
+      {!isTimesUp && !isManuallyCompleted && !isRunning && !isPaused && !isEditing && (
         <Pressable
           style={styles.editTrigger}
           onPress={() => setIsEditing(true)}
@@ -443,11 +497,11 @@ export default function ActiveCard({
         </Pressable>
       )}
 
-      {isRunning && (
+      {isRunning && !isManuallyCompleted && (
         <>
           {!isPaused && (
             <View style={styles.completeButtonRow}>
-              <Pressable style={styles.startButton} onPress={handleComplete}>
+              <Pressable style={styles.startButton} onPress={handleManualComplete}>
                 <Text style={styles.startButtonText}>Complete</Text>
               </Pressable>
             </View>
@@ -492,7 +546,7 @@ export default function ActiveCard({
         </>
       )}
 
-      {!isEditing && !isTimesUp && (
+      {!isEditing && !isTimesUp && !isManuallyCompleted && (
         <Text style={styles.reassurance}>
           {isRunning ? "You've got this." : "Starting is enough."}
         </Text>
