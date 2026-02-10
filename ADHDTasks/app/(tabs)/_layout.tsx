@@ -12,6 +12,10 @@ export default function TabLayout() {
           <Label>Now</Label>
           <Icon sf="bolt.fill" />
         </NativeTabs.Trigger>
+        <NativeTabs.Trigger name="toDoList">
+          <Label>To Do</Label>
+          <Icon sf="list.bullet" />
+        </NativeTabs.Trigger>
         <NativeTabs.Trigger name="newTask" role="search">
           <Label>Add</Label>
           <Icon sf="plus" />
@@ -51,11 +55,25 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="toDoList"
+        options={{
+          title: "To Do",
+          tabBarIcon: ({ color, size }) => (
+            <IconSymbol name="list.bullet" color={color} size={size} />
+          ),
+          headerShown: false,
+        }}
+      />
+      <Tabs.Screen
         name="history"
         options={{
           title: "History",
           tabBarIcon: ({ color, size }) => (
-            <IconSymbol name="clock.arrow.circlepath" color={color} size={size} />
+            <IconSymbol
+              name="clock.arrow.circlepath"
+              color={color}
+              size={size}
+            />
           ),
           headerShown: false,
         }}

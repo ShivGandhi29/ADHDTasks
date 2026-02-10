@@ -20,6 +20,7 @@ const MAPPING = {
   'gearshape': 'settings',
   'paperplane.fill': 'send',
   'clock.arrow.circlepath': 'history',
+  'list.bullet': 'format-list-bulleted',
   'chevron.left.forwardslash.chevron.right': 'code',
   'chevron.right': 'chevron-right',
 } as IconMapping;

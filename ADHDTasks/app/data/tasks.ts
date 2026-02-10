@@ -11,6 +11,7 @@ export type TaskItem = {
 const TASKS_STORAGE_KEY = "tasks";
 const HISTORY_STORAGE_KEY = "taskHistory";
 const ACTIVE_TASK_STORAGE_KEY = "activeTask";
+const TODO_LIST_STORAGE_KEY = "toDoList";
 
 export async function getTasks(): Promise<TaskItem[]> {
   const existing = await AsyncStorage.getItem(TASKS_STORAGE_KEY);
@@ -74,6 +75,28 @@ export async function setActiveTask(task: TaskItem): Promise<void> {
 export async function clearActiveTask(): Promise<void> {
   await AsyncStorage.removeItem(ACTIVE_TASK_STORAGE_KEY);
   clearWidget();
+}
+
+export async function getToDoListTasks(): Promise<TaskItem[]> {
+  const existing = await AsyncStorage.getItem(TODO_LIST_STORAGE_KEY);
+  if (!existing) return [];
+  try {
+    return JSON.parse(existing) as TaskItem[];
+  } catch {
+    return [];
+  }
+}
+
+export async function addToDoListTask(task: TaskItem): Promise<void> {
+  const tasks = await getToDoListTasks();
+  tasks.push(task);
+  await AsyncStorage.setItem(TODO_LIST_STORAGE_KEY, JSON.stringify(tasks));
+}
+
+export async function removeToDoListTask(taskId: string): Promise<void> {
+  const tasks = await getToDoListTasks();
+  const filtered = tasks.filter((task) => task.id !== taskId);
+  await AsyncStorage.setItem(TODO_LIST_STORAGE_KEY, JSON.stringify(filtered));
 }
 
 export default function TasksScreen() {

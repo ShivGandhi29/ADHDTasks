@@ -6,9 +6,9 @@ import PastCard from "../components/past-card";
 import {
   addTask,
   getActiveTask,
-  getHistoryTasks,
   getTasks,
-  removeHistoryTask,
+  getToDoListTasks,
+  removeToDoListTask,
   setActiveTask,
   TaskItem,
 } from "../data/tasks";
@@ -16,15 +16,14 @@ import { AppColors } from "../components/ui/ThemeColors";
 
 const MAX_TASKS = 3;
 
-export default function History() {
+export default function ToDoList() {
   const [tasks, setTasks] = useState<TaskItem[]>([]);
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
 
   const loadTasks = useCallback(async () => {
-    const existing = await getHistoryTasks();
+    const existing = await getToDoListTasks();
     const sorted = [...existing].sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
     setTasks(sorted);
   }, []);
@@ -32,24 +31,24 @@ export default function History() {
   useFocusEffect(
     useCallback(() => {
       loadTasks();
-    }, [loadTasks]),
+    }, [loadTasks])
   );
 
   const handleDelete = (taskId: string) => {
-    Alert.alert("Delete task?", "This will remove it from your history.", [
+    Alert.alert("Delete task?", "This will remove it from To Do.", [
       { text: "Cancel", style: "cancel" },
       {
         text: "Delete",
         style: "destructive",
         onPress: async () => {
-          await removeHistoryTask(taskId);
+          await removeToDoListTask(taskId);
           loadTasks();
         },
       },
     ]);
   };
 
-  const handleAddFromHistory = useCallback(async (item: TaskItem) => {
+  const handleAddToCurrent = useCallback(async (item: TaskItem) => {
     const [active, inactiveTasks] = await Promise.all([
       getActiveTask(),
       getTasks(),
@@ -66,7 +65,7 @@ export default function History() {
     if (totalCount >= MAX_TASKS) {
       Alert.alert(
         "Too many tasks",
-        "Please complete your current tasks before adding a new one.",
+        "Please complete your current tasks before adding a new one."
       );
       return;
     }
@@ -81,8 +80,10 @@ export default function History() {
     } else {
       await addTask(task);
     }
+    await removeToDoListTask(item.id);
     setExpandedTaskId(null);
-  }, []);
+    loadTasks();
+  }, [loadTasks]);
 
   const handleCardPress = useCallback((itemId: string) => {
     setExpandedTaskId((current) => (current === itemId ? null : itemId));
@@ -92,17 +93,17 @@ export default function History() {
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
         {tasks.length === 0 ? (
-          <Text style={styles.emptyText}>No past tasks yet.</Text>
+          <Text style={styles.emptyText}>No tasks in your to-do list yet.</Text>
         ) : (
           <View style={styles.list}>
             {tasks.map((item) => (
               <PastCard
                 key={item.id}
-                label="Past Task"
+                label="To Do"
                 task={item.name}
                 durationMinutes={item.durationMinutes}
                 onDelete={() => handleDelete(item.id)}
-                onReactivate={() => handleAddFromHistory(item)}
+                onReactivate={() => handleAddToCurrent(item)}
                 reactivateLabel="Add to Up Next"
                 expanded={expandedTaskId === item.id}
                 onCardPress={() => handleCardPress(item.id)}
@@ -114,6 +115,7 @@ export default function History() {
     </SafeAreaView>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

@@ -4,6 +4,7 @@ import { Swipeable } from "react-native-gesture-handler";
 import { AppColors } from "./ui/ThemeColors";
 
 type PastCardProps = {
+  label: string;
   task: string;
   durationMinutes: number;
   onDelete: () => void;
@@ -17,6 +18,7 @@ type PastCardProps = {
 };
 
 export default function PastCard({
+  label,
   task,
   durationMinutes,
   onDelete,
@@ -40,7 +42,7 @@ export default function PastCard({
         onPress={onCardPress}
         disabled={!onCardPress}
       >
-        <Text style={styles.taskLabel}>Past task</Text>
+        <Text style={styles.taskLabel}>{label}</Text>
         <Text style={styles.taskText}>{task}</Text>
         <Text style={styles.metaText}>{durationMinutes} min</Text>
         {onReactivate && (expanded || !onCardPress) && (

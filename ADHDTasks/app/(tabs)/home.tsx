@@ -11,6 +11,7 @@ import CreateTaskForm from "../components/create-task-form";
 import {
   addHistoryTask,
   addTask,
+  addToDoListTask,
   clearActiveTask,
   getActiveTask,
   getTasks,
@@ -176,14 +177,28 @@ export default function HomeScreen() {
   };
 
   const handleCreateActive = async (taskName: string, minutes: number) => {
-    const newActive: TaskItem = {
+    const newTask: TaskItem = {
       id: `${Date.now()}`,
       name: taskName,
       durationMinutes: minutes,
       createdAt: new Date().toISOString(),
     };
+    const [active, inactiveTasksList] = await Promise.all([
+      getActiveTask(),
+      getTasks(),
+    ]);
+    const totalCount = (active ? 1 : 0) + inactiveTasksList.length;
+    if (totalCount >= 3) {
+      await addToDoListTask(newTask);
+      Alert.alert(
+        "Added to To Do!",
+        "You already have 3 active tasks. Complete them first!",
+        [{ text: "OK" }],
+      );
+      return;
+    }
     setActiveTask({ task: taskName, durationMinutes: minutes });
-    await setActiveTaskStorage(newActive);
+    await setActiveTaskStorage(newTask);
   };
 
   return (
