@@ -59,7 +59,7 @@ export default function ToDoList() {
   const loadTasks = useCallback(async () => {
     const existing = await getToDoListTasks();
     const sorted = [...existing].sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
     );
     setTasks(sorted);
   }, []);

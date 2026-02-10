@@ -15,7 +15,9 @@ import {
   clearActiveTask,
   getActiveTask,
   getTasks,
+  getToDoListTasks,
   removeTask,
+  removeToDoListTask,
   setActiveTask as setActiveTaskStorage,
   TaskItem,
 } from "../data/tasks";
@@ -167,6 +169,7 @@ export default function HomeScreen() {
     };
     await addHistoryTask(historyItem);
 
+    // If there are inactive tasks, activate the first one
     if (inactiveTasks.length > 0) {
       const [nextTask, ...remaining] = inactiveTasks;
       await removeTask(nextTask.id);
@@ -176,10 +179,46 @@ export default function HomeScreen() {
       });
       await setActiveTaskStorage(nextTask);
       setInactiveTasks(remaining);
+
+      // Maintain 2 inactive tasks by pulling from To Do list if needed
+      const currentInactiveCount = remaining.length;
+      if (currentInactiveCount < 2) {
+        const toDoTasks = await getToDoListTasks();
+        const needed = 2 - currentInactiveCount;
+        for (let i = 0; i < needed && i < toDoTasks.length; i++) {
+          const taskToAdd = toDoTasks[i];
+          await removeToDoListTask(taskToAdd.id);
+          await addTask(taskToAdd);
+        }
+      }
+
       await loadTasks();
       return;
     }
 
+    // If no inactive tasks, check To Do list and activate the first task from there
+    const toDoTasks = await getToDoListTasks();
+    if (toDoTasks.length > 0) {
+      const [nextTask, ...remainingToDo] = toDoTasks;
+      await removeToDoListTask(nextTask.id);
+      setActiveTask({
+        task: nextTask.name,
+        durationMinutes: nextTask.durationMinutes,
+      });
+      await setActiveTaskStorage(nextTask);
+
+      // Fill inactive tasks up to 2 from remaining To Do list
+      const needed = 2;
+      for (let i = 0; i < needed && i < remainingToDo.length; i++) {
+        await removeToDoListTask(remainingToDo[i].id);
+        await addTask(remainingToDo[i]);
+      }
+
+      await loadTasks();
+      return;
+    }
+
+    // No tasks left, clear active and go to history
     setActiveTask(null);
     await clearActiveTask();
     await loadTasks();
