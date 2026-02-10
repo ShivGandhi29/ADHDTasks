@@ -1,50 +1,51 @@
-# Welcome to your Expo app 👋
+# Focusd
+Your ADHD to-do list. One task at a time.
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
-## Get started
+## Commands
 
-1. Install dependencies
+| Command | Description |
+|--------|-------------|
+| `yarn start` | Start the Expo dev server (Metro). |
+| `yarn android` | Run the app on an Android device or emulator (builds and launches). |
+| `yarn ios` | Run the app on the iOS simulator. |
+| `yarn web` | Start the app in the web browser. |
+| `yarn lint` | Run the linter. |
 
-   ```bash
-   yarn
-   ```
+### Android build & install
 
-2. Start the app
+| Command | Description |
+|--------|-------------|
+| `yarn android:build` | Build the Android APK and install it on all connected USB devices. |
+| `yarn android:build-only` | Build a **release** APK (smaller size), copy to **`dist/Focusd-<version>-android.apk`**. Use this file to share the app. |
 
-   ```bash
-   yarn start
-   ```
+**If tapping the APK does nothing on their phone:** Android is blocking the install. They need to allow “Install unknown apps” for the app that opens the file (e.g. Chrome or Files): **Settings → Apps → [that app] → Install unknown apps → Allow**.
 
-In the output, you'll find options to open the app in a
+**File size:** The build is configured for phone CPUs only (arm64 + armv7), and the shareable APK is a release build (minified), so the APK in `dist/` should be much smaller than a debug build. To build for the emulator too, set in `android/gradle.properties`: `reactNativeArchitectures=armeabi-v7a,arm64-v8a,x86,x86_64`.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+**Script options** (when running the script directly):
 
 ```bash
-yarn reset-project
+./scripts/build-and-install-android.sh [options]
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+| Option | Description |
+|--------|-------------|
+| (none) | Build debug APK and install on all connected devices. |
+| `--build-only` | Build only; copy APK to `dist/` and print the path. Same as `yarn android:build-only`. |
+| `--release` | Build release APK instead of debug, then install. |
+| `--device SERIAL` | Install only on the device with this `adb` serial (use `adb devices` to list). |
+| `-h`, `--help` | Show usage. |
 
-## Learn more
+**Requirements for install:** Android SDK and `adb` (platform-tools). Enable USB debugging on the device.
 
-To learn more about developing your project with Expo, look at the following resources:
+### Other scripts
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+| Command | Description |
+|--------|-------------|
+| `yarn reset-project` | Move starter code to **app-example** and create a blank **app** directory. |
+| `yarn sync-icon` | Sync app icon assets. |
+| `yarn sync-native-assets` | Sync native assets. |
+| `yarn make-app-icon-opaque` | Make the app icon opaque. |
 
-## Join the community
 
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.

@@ -71,7 +71,7 @@ export default function ToDoList() {
   );
 
   const handleDelete = (taskId: string) => {
-    Alert.alert("Delete task?", "This will remove it from To Do.", [
+    Alert.alert("Delete task?", "This will remove it from Tasks.", [
       { text: "Cancel", style: "cancel" },
       {
         text: "Delete",

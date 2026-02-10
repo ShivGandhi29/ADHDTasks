@@ -213,7 +213,7 @@ export default function HomeScreen() {
     if (totalCount >= 3) {
       await addToDoListTask(newTask);
       Alert.alert(
-        "Added to To Do!",
+        "Added to Tasks!",
         "You already have 3 active tasks. Complete them first!",
         [{ text: "OK" }],
       );

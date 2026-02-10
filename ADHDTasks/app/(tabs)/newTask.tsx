@@ -53,7 +53,7 @@ export default function NewTask() {
       if (totalCount >= MAX_TASKS) {
         await addToDoListTask(newTask);
         Alert.alert(
-          "Added to To Do!",
+          "Added to Tasks!",
           "You already have 3 active tasks. Complete them first!",
           [{ text: "OK" }],
         );
