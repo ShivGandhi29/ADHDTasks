@@ -1,5 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { ScrollView, View, Text, TextInput, Pressable, StyleSheet } from "react-native";
+import {
+  ScrollView,
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  StyleSheet,
+} from "react-native";
 import { CountdownCircleTimer } from "react-native-countdown-circle-timer";
 import { playTimerEndAlarm } from "../utils/timer-alarm";
 import { AppColors } from "./ui/ThemeColors";
@@ -22,7 +29,10 @@ export default function ActiveCard({
   onComplete,
   onUpdate,
 }: ActiveCardProps) {
-  const durationSeconds = useMemo(() => durationMinutes * 60, [durationMinutes]);
+  const durationSeconds = useMemo(
+    () => durationMinutes * 60,
+    [durationMinutes],
+  );
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [remainingSeconds, setRemainingSeconds] = useState(durationSeconds);
@@ -163,8 +173,16 @@ export default function ActiveCard({
             isPlaying={!isPaused}
             duration={durationSeconds}
             initialRemainingTime={remainingSeconds}
-            colors={[AppColors.TextDark, AppColors.SlateGray, AppColors.AccentRed]}
-            colorsTime={[durationSeconds, Math.max(2, durationSeconds * 0.3), 0]}
+            colors={[
+              AppColors.TextDark,
+              AppColors.SlateGray,
+              AppColors.AccentRed,
+            ]}
+            colorsTime={[
+              durationSeconds,
+              Math.max(2, durationSeconds * 0.3),
+              0,
+            ]}
             strokeWidth={10}
             size={300}
             updateInterval={1}
@@ -224,33 +242,47 @@ export default function ActiveCard({
       )}
 
       {!isTimesUp && !isRunning && !isPaused && !isEditing && (
-        <Pressable style={styles.editTrigger} onPress={() => setIsEditing(true)}>
+        <Pressable
+          style={styles.editTrigger}
+          onPress={() => setIsEditing(true)}
+        >
           <Text style={styles.editTriggerText}>Edit task</Text>
         </Pressable>
       )}
 
       {isRunning && (
-        <View style={styles.actionRow}>
-          <Pressable
-            style={[styles.actionButton, isPaused && styles.actionButtonActive]}
-            onPress={onPause}
-          >
-            <Text style={styles.actionButtonText}>
-              {isPaused ? "Paused" : "Pause"}
-            </Text>
-          </Pressable>
-          <Pressable style={styles.actionButton} onPress={handleComplete}>
-            <Text style={styles.actionButtonText}>Complete</Text>
-          </Pressable>
-          <Pressable
-            style={[styles.actionButton, styles.actionButtonCancel]}
-            onPress={handleCancel}
-          >
-            <Text style={[styles.actionButtonText, styles.actionButtonCancelText]}>
-              Cancel
-            </Text>
-          </Pressable>
-        </View>
+        <>
+          {!isPaused && (
+            <View style={styles.completeButtonRow}>
+              <Pressable style={styles.startButton} onPress={handleComplete}>
+                <Text style={styles.startButtonText}>Complete</Text>
+              </Pressable>
+            </View>
+          )}
+          <View style={styles.actionRow}>
+            <Pressable
+              style={[
+                styles.actionButton,
+                isPaused && styles.actionButtonActive,
+              ]}
+              onPress={onPause}
+            >
+              <Text style={styles.actionButtonText}>
+                {isPaused ? "Paused" : "Pause"}
+              </Text>
+            </Pressable>
+            <Pressable
+              style={[styles.actionButton, styles.actionButtonCancel]}
+              onPress={handleCancel}
+            >
+              <Text
+                style={[styles.actionButtonText, styles.actionButtonCancelText]}
+              >
+                Cancel
+              </Text>
+            </Pressable>
+          </View>
+        </>
       )}
 
       {!isEditing && !isTimesUp && (
@@ -265,7 +297,10 @@ export default function ActiveCard({
     <View style={[styles.card, isRunning && styles.cardFullScreen]}>
       {isRunning ? (
         <ScrollView
-          contentContainerStyle={[styles.cardContent, styles.cardContentFullScreen]}
+          contentContainerStyle={[
+            styles.cardContent,
+            styles.cardContentFullScreen,
+          ]}
           showsVerticalScrollIndicator={false}
         >
           {cardBody}
@@ -359,6 +394,10 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: "center",
     width: "100%",
+  },
+  completeButtonRow: {
+    marginTop: 12,
+    marginBottom: 16,
   },
   startButtonText: {
     color: AppColors.White,
@@ -473,5 +512,4 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: AppColors.Ink,
   },
-
 });
