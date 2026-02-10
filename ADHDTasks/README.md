@@ -2,15 +2,6 @@
 Your ADHD to-do list. One task at a time.
 
 
-## Commands
-
-| Command | Description |
-|--------|-------------|
-| `yarn start` | Start the Expo dev server (Metro). |
-| `yarn android` | Run the app on an Android device or emulator (builds and launches). |
-| `yarn ios` | Run the app on the iOS simulator. |
-| `yarn web` | Start the app in the web browser. |
-| `yarn lint` | Run the linter. |
 
 ### Android build & install
 
