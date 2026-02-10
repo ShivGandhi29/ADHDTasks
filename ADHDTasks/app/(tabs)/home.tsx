@@ -154,22 +154,6 @@ export default function HomeScreen() {
   );
 
   const handleActivateInactive = (task: TaskItem) => {
-    if (activeTask && activeTask.task !== task.name) {
-      Alert.alert(
-        "Replace active task?",
-        "You already have an active task. Replace it with this one?",
-        [
-          { text: "Cancel", style: "cancel" },
-          {
-            text: "Replace",
-            style: "destructive",
-            onPress: () => activateInactiveTask(task),
-          },
-        ],
-      );
-      return;
-    }
-
     activateInactiveTask(task);
   };
 

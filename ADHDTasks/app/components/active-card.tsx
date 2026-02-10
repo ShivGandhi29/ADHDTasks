@@ -204,7 +204,6 @@ export default function ActiveCard({
         },
         editTrigger: {
           alignItems: "center",
-          marginTop: 12,
           paddingVertical: 8,
         },
         editTriggerText: {
