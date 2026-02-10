@@ -1,8 +1,19 @@
 import React, { useCallback, useState } from "react";
-import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
-import { useFocusEffect } from "expo-router";
+import {
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { useFocusEffect, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+import EmptyStateTemplate, {
+  emptyStateCtaStyles,
+} from "../components/empty-state-template";
 import PastCard from "../components/past-card";
+import IconSymbol from "../components/ui/icon-symbol";
 import {
   addTask,
   getActiveTask,
@@ -17,6 +28,7 @@ import { AppColors } from "../components/ui/ThemeColors";
 const MAX_TASKS = 3;
 
 export default function History() {
+  const router = useRouter();
   const [tasks, setTasks] = useState<TaskItem[]>([]);
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
 
@@ -90,9 +102,37 @@ export default function History() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.content,
+          tasks.length === 0 && styles.contentEmpty,
+        ]}
+      >
         {tasks.length === 0 ? (
-          <Text style={styles.emptyText}>No past tasks yet.</Text>
+          <EmptyStateTemplate
+            emoji={["📜", "✅"]}
+            title="No history yet"
+            subtitle="Completed tasks will show up here. Finish something from Now and it'll appear in history. You can add it back to your list anytime."
+            ctaContent={
+              <Pressable
+                style={({ pressed }) => [
+                  styles.ctaPressable,
+                  pressed && styles.ctaPressablePressed,
+                ]}
+                onPress={() => router.navigate("/(tabs)/home")}
+              >
+                <View style={styles.ctaIconWrap}>
+                  <IconSymbol
+                    name="bolt.fill"
+                    size={38}
+                    color={AppColors.BrandBlue}
+                  />
+                </View>
+                <Text style={styles.ctaHeadline}>Start a task</Text>
+                
+              </Pressable>
+            }
+          />
         ) : (
           <View style={styles.list}>
             {tasks.map((item) => (
@@ -123,13 +163,28 @@ const styles = StyleSheet.create({
     padding: 24,
     gap: 16,
   },
+  contentEmpty: {
+    flexGrow: 1,
+    justifyContent: "center",
+    paddingVertical: 48,
+  },
   list: {
     gap: 12,
   },
-  emptyText: {
-    fontSize: 16,
-    color: AppColors.SlateGray,
-    textAlign: "center",
-    marginTop: 32,
+  ctaPressable: {
+    alignItems: "center",
+    paddingVertical: 4,
+  },
+  ctaPressablePressed: {
+    opacity: 0.85,
+  },
+  ctaIconWrap: {
+    marginBottom: 0,
+  },
+  ctaHeadline: {
+    fontSize: 17,
+    fontWeight: "700",
+    color: AppColors.BrandBlue,
+    marginBottom: 6,
   },
 });

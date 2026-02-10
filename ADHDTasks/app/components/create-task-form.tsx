@@ -15,6 +15,8 @@ type CreateTaskFormProps = {
   initialDuration?: number;
   /** Whether to show the card wrapper with shadow (default: true) */
   showCard?: boolean;
+  /** Whether to show the "New Task" heading (default: true). Set false when the parent provides its own header. */
+  showHeading?: boolean;
 };
 
 export default function CreateTaskForm({
@@ -24,6 +26,7 @@ export default function CreateTaskForm({
   initialTaskName = "",
   initialDuration,
   showCard = true,
+  showHeading = true,
 }: CreateTaskFormProps) {
   const [taskName, setTaskName] = useState(initialTaskName);
   const [durationMinutes, setDurationMinutes] = useState(
@@ -60,7 +63,9 @@ export default function CreateTaskForm({
 
   const content = (
     <>
-      {!isEditMode && <Text style={styles.heading}>New Task</Text>}
+      {!isEditMode && showHeading && (
+        <Text style={styles.heading}>New Task</Text>
+      )}
 
       <Text style={styles.fieldLabel}>Task name</Text>
       <TextInput

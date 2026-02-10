@@ -1,5 +1,5 @@
 import React from "react";
-import { Alert, StyleSheet } from "react-native";
+import { Alert, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -54,7 +54,14 @@ export default function NewTask() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <CreateTaskForm onSubmit={handleAddTask} submitLabel="Add Task" />
+      <View style={styles.header}>
+        <Text style={styles.greeting}>New Task</Text>
+      </View>
+      <CreateTaskForm
+        onSubmit={handleAddTask}
+        submitLabel="Add Task"
+        showHeading={false}
+      />
     </SafeAreaView>
   );
 }
@@ -65,5 +72,14 @@ const styles = StyleSheet.create({
     backgroundColor: AppColors.White,
     padding: 16,
     //justifyContent: "center",
+  },
+  header: {
+    marginTop: 14,
+    marginBottom: 16,
+  },
+  greeting: {
+    fontSize: 32,
+    fontWeight: "600",
+    color: AppColors.TextDark,
   },
 });

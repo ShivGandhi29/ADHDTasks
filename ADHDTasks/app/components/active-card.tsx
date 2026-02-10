@@ -325,10 +325,8 @@ export default function ActiveCard({
       <View
         style={[
           styles.cardContent,
-          isRunning && [
-            styles.cardContentFullScreen,
-            
-          ],
+          !isRunning && styles.cardContentCompact,
+          isRunning && styles.cardContentFullScreen,
         ]}
       >
         {cardBody}
@@ -357,6 +355,10 @@ const styles = StyleSheet.create({
   },
   cardContent: {
     padding: 28,
+  },
+  /** Tighter top padding when not full screen so gap above card matches home header→form spacing */
+  cardContentCompact: {
+    paddingTop: 16,
   },
   cardContentFullScreen: {
     paddingHorizontal: 28,
