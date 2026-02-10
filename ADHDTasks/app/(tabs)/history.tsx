@@ -9,9 +9,7 @@ import {
 } from "react-native";
 import { useFocusEffect, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import EmptyStateTemplate, {
-  emptyStateCtaStyles,
-} from "../components/empty-state-template";
+import EmptyStateTemplate from "../components/empty-state-template";
 import PastCard from "../components/past-card";
 import IconSymbol from "../components/ui/icon-symbol";
 import {
@@ -23,13 +21,37 @@ import {
   setActiveTask,
   TaskItem,
 } from "../data/tasks";
-import { AppColors } from "../components/ui/ThemeColors";
+import { useTheme } from "../context/ThemeContext";
 
 const MAX_TASKS = 3;
 
 export default function History() {
   const router = useRouter();
+  const { colors } = useTheme();
   const [tasks, setTasks] = useState<TaskItem[]>([]);
+  const styles = React.useMemo(
+    () =>
+      StyleSheet.create({
+        container: { flex: 1, backgroundColor: colors.background },
+        content: { padding: 24, gap: 16 },
+        contentEmpty: {
+          flexGrow: 1,
+          justifyContent: "center",
+          paddingVertical: 48,
+        },
+        list: { gap: 12 },
+        ctaPressable: { alignItems: "center", paddingVertical: 4 },
+        ctaPressablePressed: { opacity: 0.85 },
+        ctaIconWrap: { marginBottom: 0 },
+        ctaHeadline: {
+          fontSize: 17,
+          fontWeight: "700",
+          color: colors.brand,
+          marginBottom: 6,
+        },
+      }),
+    [colors]
+  );
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
 
   const loadTasks = useCallback(async () => {
@@ -125,11 +147,10 @@ export default function History() {
                   <IconSymbol
                     name="bolt.fill"
                     size={38}
-                    color={AppColors.BrandBlue}
+                    color={colors.brand}
                   />
                 </View>
                 <Text style={styles.ctaHeadline}>Start a task</Text>
-                
               </Pressable>
             }
           />
@@ -154,37 +175,3 @@ export default function History() {
     </SafeAreaView>
   );
 }
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: AppColors.White,
-  },
-  content: {
-    padding: 24,
-    gap: 16,
-  },
-  contentEmpty: {
-    flexGrow: 1,
-    justifyContent: "center",
-    paddingVertical: 48,
-  },
-  list: {
-    gap: 12,
-  },
-  ctaPressable: {
-    alignItems: "center",
-    paddingVertical: 4,
-  },
-  ctaPressablePressed: {
-    opacity: 0.85,
-  },
-  ctaIconWrap: {
-    marginBottom: 0,
-  },
-  ctaHeadline: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: AppColors.BrandBlue,
-    marginBottom: 6,
-  },
-});

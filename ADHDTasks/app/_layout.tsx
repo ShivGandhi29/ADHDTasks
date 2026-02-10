@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import {
   DarkTheme,
   DefaultTheme,
-  ThemeProvider,
+  ThemeProvider as NavThemeProvider,
 } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -11,7 +11,7 @@ import "react-native-reanimated";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import { useColorScheme } from "./hooks/use-color-scheme";
+import { ThemeProvider, useTheme } from "./context/ThemeContext";
 
 // Keep the splash visible until we explicitly hide it (after a minimum delay)
 SplashScreen.preventAutoHideAsync();
@@ -22,9 +22,21 @@ export const unstable_settings = {
   anchor: "(tabs)",
 };
 
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
+function RootLayoutContent() {
+  const { theme } = useTheme();
 
+  return (
+    <NavThemeProvider value={theme === "dark" ? DarkTheme : DefaultTheme}>
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+      </Stack>
+      <StatusBar style={theme === "dark" ? "light" : "dark"} />
+    </NavThemeProvider>
+  );
+}
+
+export default function RootLayout() {
   useEffect(() => {
     const t = setTimeout(() => {
       SplashScreen.hideAsync();
@@ -35,14 +47,8 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <ThemeProvider
-          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-        >
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-          </Stack>
-          <StatusBar style="auto" />
+        <ThemeProvider>
+          <RootLayoutContent />
         </ThemeProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

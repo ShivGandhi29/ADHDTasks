@@ -20,10 +20,38 @@ import {
   TaskItem,
 } from "../data/tasks";
 import { syncWidgetWithTask } from "../utils/widget";
-import { AppColors } from "../components/ui/ThemeColors";
+import { useTheme } from "../context/ThemeContext";
 
 export default function HomeScreen() {
+  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        container: { flex: 1, backgroundColor: colors.background },
+        content: { padding: 16, gap: 16 },
+        list: { gap: 12 },
+        upNextHeader: {
+          fontSize: 20,
+          fontWeight: "700",
+          color: colors.textSecondary,
+          textTransform: "uppercase",
+          letterSpacing: 5,
+          marginBottom: 8,
+          marginTop: 16,
+          textAlign: "center",
+        },
+        header: { marginTop: 14, marginBottom: 14 },
+        greeting: {
+          fontSize: 32,
+          fontWeight: "600",
+          color: colors.text,
+        },
+        contentFullScreen: { padding: 0 },
+        activeFullScreen: {},
+      }),
+    [colors]
+  );
   const [inactiveTasks, setInactiveTasks] = useState<TaskItem[]>([]);
   const [isActiveRunning, setIsActiveRunning] = useState(false);
   const [activeTask, setActiveTask] = useState<{
@@ -251,39 +279,3 @@ export default function HomeScreen() {
     </SafeAreaView>
   );
 }
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: AppColors.White,
-  },
-  content: {
-    padding: 16,
-    gap: 16,
-  },
-  list: {
-    gap: 12,
-  },
-  upNextHeader: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: AppColors.Ink,
-    textTransform: "uppercase",
-    letterSpacing: 5,
-    marginBottom: 8,
-    marginTop: 16,
-    textAlign: "center",
-  },
-  header: {
-    marginTop: 14,
-    marginBottom: 14,
-  },
-  greeting: {
-    fontSize: 32,
-    fontWeight: "600",
-    color: AppColors.TextDark,
-  },
-  contentFullScreen: {
-    padding: 0,
-  },
-  activeFullScreen: {},
-});

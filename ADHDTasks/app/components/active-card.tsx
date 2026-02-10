@@ -1,15 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  Pressable,
-  StyleSheet,
-} from "react-native";
+import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { CountdownCircleTimer } from "react-native-countdown-circle-timer";
 import { playTimerEndAlarm } from "../utils/timer-alarm";
-import { AppColors } from "./ui/ThemeColors";
+import { useTheme } from "../context/ThemeContext";
 import CreateTaskForm from "./create-task-form";
 
 type ActiveCardProps = {
@@ -44,6 +38,7 @@ export default function ActiveCard({
   const [editingNameValue, setEditingNameValue] = useState(task);
   const [isTimesUp, setIsTimesUp] = useState(false);
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
 
   useEffect(() => {
     // Notify parent when running/paused state changes (not every second tick).
@@ -133,9 +128,196 @@ export default function ActiveCard({
     setIsEditing(false);
   };
 
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        card: {
+          backgroundColor: colors.cardMuted,
+          borderRadius: 20,
+        },
+        cardFullScreen: {
+          width: "100%",
+          borderRadius: 0,
+          shadowOpacity: 0,
+          shadowRadius: 0,
+          shadowOffset: { width: 0, height: 0 },
+          elevation: 0,
+        },
+        cardContent: { padding: 28 },
+        cardContentCompact: { paddingTop: 16 },
+        cardContentFullScreen: {
+          paddingHorizontal: 28,
+          paddingVertical: 40,
+        },
+        taskLabel: {
+          fontSize: 13,
+          color: colors.textMuted,
+          marginBottom: 6,
+          textTransform: "uppercase",
+          letterSpacing: 0.6,
+        },
+        taskNameTouchable: { marginBottom: 28 },
+        taskText: {
+          fontSize: 26,
+          fontWeight: "700",
+          color: colors.text,
+          lineHeight: 34,
+        },
+        taskNameInput: {
+          marginBottom: 28,
+          padding: 0,
+          marginVertical: 0,
+          minHeight: 34,
+          textAlignVertical: "top",
+        },
+        timerWrapper: {
+          alignItems: "center",
+          marginBottom: 24,
+          marginTop: 8,
+        },
+        timerText: {
+          fontSize: 38,
+          color: colors.text,
+          fontWeight: "700",
+          letterSpacing: 1,
+        },
+        startSection: { alignItems: "center", marginBottom: 16 },
+        startMeta: {
+          fontSize: 15,
+          color: colors.textSecondary,
+          marginBottom: 14,
+        },
+        startButton: {
+          backgroundColor: colors.text,
+          paddingVertical: 22,
+          paddingHorizontal: 48,
+          borderRadius: 16,
+          alignItems: "center",
+          width: "100%",
+        },
+        completeButtonRow: { marginTop: 12, marginBottom: 16 },
+        startButtonText: {
+          color: colors.background,
+          fontSize: 22,
+          fontWeight: "700",
+          letterSpacing: 0.5,
+        },
+        editTrigger: {
+          alignItems: "center",
+          marginTop: 12,
+          paddingVertical: 8,
+        },
+        editTriggerText: {
+          fontSize: 14,
+          color: colors.textSecondary,
+          fontWeight: "500",
+          textDecorationLine: "underline",
+        },
+        needMoreTimeSection: { marginBottom: 16 },
+        needMoreTimeLabel: {
+          fontSize: 14,
+          color: colors.textMuted,
+          marginBottom: 10,
+          textAlign: "center",
+        },
+        needMoreTimeRow: {
+          flexDirection: "row",
+          flexWrap: "wrap",
+          gap: 10,
+          justifyContent: "center",
+        },
+        needMoreTimeChip: {
+          borderWidth: 1.5,
+          borderColor: colors.borderLight,
+          backgroundColor: colors.card,
+          paddingHorizontal: 14,
+          paddingVertical: 10,
+          borderRadius: 999,
+        },
+        needMoreTimeChipText: {
+          fontSize: 14,
+          color: colors.textSecondary,
+          fontWeight: "600",
+        },
+        actionRow: {
+          flexDirection: "row",
+          gap: 10,
+          justifyContent: "center",
+          marginBottom: 16,
+        },
+        actionButton: {
+          borderWidth: 1,
+          borderColor: colors.border,
+          paddingVertical: 12,
+          paddingHorizontal: 18,
+          borderRadius: 12,
+        },
+        actionButtonActive: { backgroundColor: colors.surface },
+        actionButtonText: {
+          fontSize: 15,
+          color: colors.textSecondary,
+          fontWeight: "600",
+        },
+        actionButtonCancel: { borderColor: colors.alert },
+        actionButtonCancelText: { color: colors.alert },
+        reassurance: {
+          fontSize: 14,
+          color: colors.textSecondary,
+          textAlign: "center",
+          marginTop: 16,
+        },
+        timesUpSection: { alignItems: "center", paddingVertical: 8 },
+        timesUpEmoji: { fontSize: 48, marginBottom: 8 },
+        timesUpTitle: {
+          fontSize: 28,
+          fontWeight: "700",
+          color: colors.text,
+          marginBottom: 8,
+        },
+        timesUpSubtitle: {
+          fontSize: 15,
+          color: colors.textSecondary,
+          textAlign: "center",
+          marginBottom: 24,
+          lineHeight: 22,
+        },
+        completeButton: {
+          backgroundColor: colors.text,
+          paddingVertical: 20,
+          borderRadius: 16,
+          alignItems: "center",
+          width: "100%",
+          marginBottom: 24,
+        },
+        completeButtonText: {
+          color: colors.background,
+          fontSize: 20,
+          fontWeight: "700",
+        },
+        extendLabel: {
+          fontSize: 14,
+          color: colors.textMuted,
+          marginBottom: 12,
+        },
+        extendRow: { flexDirection: "row", gap: 12 },
+        extendChip: {
+          borderWidth: 1,
+          borderColor: colors.border,
+          paddingVertical: 12,
+          paddingHorizontal: 20,
+          borderRadius: 12,
+        },
+        extendChipText: {
+          fontSize: 15,
+          fontWeight: "600",
+          color: colors.textSecondary,
+        },
+      }),
+    [colors],
+  );
+
   const cardBody = (
     <>
-
       {isEditing ? (
         <CreateTaskForm
           initialTaskName={task}
@@ -150,7 +332,7 @@ export default function ActiveCard({
           value={editingNameValue}
           onChangeText={setEditingNameValue}
           placeholder="Task name"
-          placeholderTextColor={AppColors.MutedGray}
+          placeholderTextColor={colors.textMuted}
           autoFocus
           selectTextOnFocus
           multiline
@@ -186,11 +368,13 @@ export default function ActiveCard({
             isPlaying={!isPaused}
             duration={currentDurationSeconds}
             initialRemainingTime={remainingSeconds}
-            colors={[
-              AppColors.TextDark,
-              AppColors.SlateGray,
-              AppColors.AccentRed,
-            ]}
+            colors={
+              [colors.text, colors.textSecondary, colors.accentRed] as [
+                `#${string}`,
+                `#${string}`,
+                `#${string}`,
+              ]
+            }
             colorsTime={[
               currentDurationSeconds,
               Math.max(2, currentDurationSeconds * 0.3),
@@ -334,238 +518,3 @@ export default function ActiveCard({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: AppColors.White,
-    borderRadius: 20,
-    shadowColor: AppColors.Black,
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 3,
-  },
-  cardFullScreen: {
-    width: "100%",
-    borderRadius: 0,
-    shadowOpacity: 0,
-    shadowRadius: 0,
-    shadowOffset: { width: 0, height: 0 },
-    elevation: 0,
-  },
-  cardContent: {
-    padding: 28,
-  },
-  /** Tighter top padding when not full screen so gap above card matches home header→form spacing */
-  cardContentCompact: {
-    paddingTop: 16,
-  },
-  cardContentFullScreen: {
-    paddingHorizontal: 28,
-    paddingVertical: 40,
-  },
-
-  // Header
-  taskLabel: {
-    fontSize: 13,
-    color: AppColors.MutedGray,
-    marginBottom: 6,
-    textTransform: "uppercase",
-    letterSpacing: 0.6,
-  },
-  taskNameTouchable: {
-    marginBottom: 28,
-  },
-  taskText: {
-    fontSize: 26,
-    fontWeight: "700",
-    color: AppColors.TextDark,
-    lineHeight: 34,
-  },
-  taskNameInput: {
-    marginBottom: 28,
-    padding: 0,
-    marginVertical: 0,
-    minHeight: 34,
-    textAlignVertical: "top",
-  },
-
-  // Timer
-  timerWrapper: {
-    alignItems: "center",
-    marginBottom: 24,
-    marginTop: 8,
-  },
-  timerText: {
-    fontSize: 38,
-    color: AppColors.TextDark,
-    fontWeight: "700",
-    letterSpacing: 1,
-  },
-
-  // Start / Resume
-  startSection: {
-    alignItems: "center",
-    marginBottom: 16,
-  },
-  startMeta: {
-    fontSize: 15,
-    color: AppColors.SlateGray,
-    marginBottom: 14,
-  },
-  startButton: {
-    backgroundColor: AppColors.TextDark,
-    paddingVertical: 22,
-    paddingHorizontal: 48,
-    borderRadius: 16,
-    alignItems: "center",
-    width: "100%",
-  },
-  completeButtonRow: {
-    marginTop: 12,
-    marginBottom: 16,
-  },
-  startButtonText: {
-    color: AppColors.White,
-    fontSize: 22,
-    fontWeight: "700",
-    letterSpacing: 0.5,
-  },
-
-  // Edit trigger
-  editTrigger: {
-    alignItems: "center",
-    marginTop: 12,
-    paddingVertical: 8,
-  },
-  editTriggerText: {
-    fontSize: 14,
-    color: AppColors.SlateGray,
-    fontWeight: "500",
-    textDecorationLine: "underline",
-  },
-
-  // Need more time (while running)
-  needMoreTimeSection: {
-    marginBottom: 16,
-  },
-  needMoreTimeLabel: {
-    fontSize: 14,
-    color: AppColors.MutedGray,
-    marginBottom: 10,
-    textAlign: "center",
-  },
-  needMoreTimeRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-    justifyContent: "center",
-  },
-  needMoreTimeChip: {
-    borderWidth: 1.5,
-    borderColor: AppColors.LightGray,
-    backgroundColor: AppColors.White,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 999,
-  },
-  needMoreTimeChipText: {
-    fontSize: 14,
-    color: AppColors.Ink,
-    fontWeight: "600",
-  },
-
-  // Running actions
-  actionRow: {
-    flexDirection: "row",
-    gap: 10,
-    justifyContent: "center",
-    marginBottom: 16,
-  },
-  actionButton: {
-    borderWidth: 1,
-    borderColor: AppColors.BorderGray,
-    paddingVertical: 12,
-    paddingHorizontal: 18,
-    borderRadius: 12,
-  },
-  actionButtonActive: {
-    backgroundColor: AppColors.WhiteSmoke,
-  },
-  actionButtonText: {
-    fontSize: 15,
-    color: AppColors.Ink,
-    fontWeight: "600",
-  },
-  actionButtonCancel: {
-    borderColor: AppColors.AlertRed,
-  },
-  actionButtonCancelText: {
-    color: AppColors.AlertRed,
-  },
-
-  // Reassurance
-  reassurance: {
-    fontSize: 14,
-    color: AppColors.SlateGray,
-    textAlign: "center",
-    marginTop: 16,
-  },
-
-  // Time's up
-  timesUpSection: {
-    alignItems: "center",
-    paddingVertical: 8,
-  },
-  timesUpEmoji: {
-    fontSize: 48,
-    marginBottom: 8,
-  },
-  timesUpTitle: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: AppColors.TextDark,
-    marginBottom: 8,
-  },
-  timesUpSubtitle: {
-    fontSize: 15,
-    color: AppColors.SlateGray,
-    textAlign: "center",
-    marginBottom: 24,
-    lineHeight: 22,
-  },
-  completeButton: {
-    backgroundColor: AppColors.TextDark,
-    paddingVertical: 20,
-    borderRadius: 16,
-    alignItems: "center",
-    width: "100%",
-    marginBottom: 24,
-  },
-  completeButtonText: {
-    color: AppColors.White,
-    fontSize: 20,
-    fontWeight: "700",
-  },
-  extendLabel: {
-    fontSize: 14,
-    color: AppColors.MutedGray,
-    marginBottom: 12,
-  },
-  extendRow: {
-    flexDirection: "row",
-    gap: 12,
-  },
-  extendChip: {
-    borderWidth: 1,
-    borderColor: AppColors.BorderGray,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-  },
-  extendChipText: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: AppColors.Ink,
-  },
-});

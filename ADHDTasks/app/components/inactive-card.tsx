@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Pressable, Text, View, StyleSheet } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
-import { AppColors } from "./ui/ThemeColors";
+import { useTheme } from "../context/ThemeContext";
 
 type InactiveCardProps = {
   task: string;
@@ -20,6 +20,50 @@ export default function InactiveCard({
   expanded = false,
   onCardPress,
 }: InactiveCardProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        card: {
+          backgroundColor: colors.cardMuted,
+          borderRadius: 20,
+          padding: 20,
+        },
+        deleteContainer: {
+          justifyContent: "center",
+          alignItems: "flex-end",
+          paddingLeft: 12,
+        },
+        deleteButton: {
+          backgroundColor: colors.alert,
+          borderRadius: 16,
+          paddingVertical: 12,
+          paddingHorizontal: 16,
+        },
+        deleteText: { color: colors.white, fontWeight: "600" },
+        taskText: {
+          fontSize: 20,
+          fontWeight: "600",
+          color: colors.text,
+          marginBottom: 6,
+        },
+        metaText: { fontSize: 14, color: colors.textSecondary },
+        startNowButton: {
+          marginTop: 12,
+          backgroundColor: colors.text,
+          paddingVertical: 10,
+          borderRadius: 10,
+          alignItems: "center",
+        },
+        startNowText: {
+          color: colors.background,
+          fontSize: 14,
+          fontWeight: "600",
+        },
+      }),
+    [colors]
+  );
+
   const renderRightActions = () => (
     <View style={styles.deleteContainer}>
       <Pressable style={styles.deleteButton} onPress={onDelete}>
@@ -44,49 +88,3 @@ export default function InactiveCard({
     </Swipeable>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: AppColors.OffWhite,
-    borderRadius: 20,
-    padding: 20,
-
-  },
-  deleteContainer: {
-    justifyContent: "center",
-    alignItems: "flex-end",
-    paddingLeft: 12,
-  },
-  deleteButton: {
-    backgroundColor: AppColors.AlertRed,
-    borderRadius: 16,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-  },
-  deleteText: {
-    color: AppColors.White,
-    fontWeight: "600",
-  },
-  taskText: {
-    fontSize: 20,
-    fontWeight: "600",
-    color: AppColors.TextDark,
-    marginBottom: 6,
-  },
-  metaText: {
-    fontSize: 14,
-    color: AppColors.SlateGray,
-  },
-  startNowButton: {
-    marginTop: 12,
-    backgroundColor: AppColors.TextDark,
-    paddingVertical: 10,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  startNowText: {
-    color: AppColors.White,
-    fontSize: 14,
-    fontWeight: "600",
-  },
-});

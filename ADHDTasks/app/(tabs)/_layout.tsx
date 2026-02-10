@@ -33,7 +33,11 @@ export default function TabLayout() {
   }
 
   return (
-    <Tabs>
+    <Tabs
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
       <Tabs.Screen
         name="home"
         options={{
@@ -51,7 +55,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <IconSymbol name="plus" color={color} size={size} />
           ),
-          headerShown: false,
         }}
       />
       <Tabs.Screen
@@ -61,7 +64,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <IconSymbol name="list.bullet" color={color} size={size} />
           ),
-          headerShown: false,
         }}
       />
       <Tabs.Screen
@@ -75,7 +77,6 @@ export default function TabLayout() {
               size={size}
             />
           ),
-          headerShown: false,
         }}
       />
       <Tabs.Screen
@@ -85,7 +86,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <IconSymbol name="gearshape" color={color} size={size} />
           ),
-          headerShown: false,
         }}
       />
     </Tabs>

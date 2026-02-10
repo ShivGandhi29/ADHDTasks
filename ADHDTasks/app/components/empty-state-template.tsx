@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { StyleSheet, Text, View, useWindowDimensions } from "react-native";
-import { AppColors } from "./ui/ThemeColors";
+import { useTheme } from "../context/ThemeContext";
 
 export type EmptyStateTemplateProps = {
   /** Main emoji or [main, accent] e.g. "📋" or ["📋", "✨"] */
@@ -20,8 +20,50 @@ export default function EmptyStateTemplate({
   ctaContent,
 }: EmptyStateTemplateProps) {
   const { width } = useWindowDimensions();
+  const { colors } = useTheme();
   const emojis = Array.isArray(emoji) ? emoji : [emoji];
   const [mainEmoji, accentEmoji] = emojis;
+
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        container: { alignItems: "center", paddingHorizontal: 8 },
+        iconRow: {
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          marginBottom: 20,
+          gap: 8,
+        },
+        emoji: { fontSize: 56 },
+        emojiAccent: { fontSize: 32 },
+        title: {
+          fontSize: 24,
+          fontWeight: "700",
+          color: colors.text,
+          textAlign: "center",
+          marginBottom: 12,
+          paddingHorizontal: 16,
+        },
+        subtitle: {
+          fontSize: 16,
+          lineHeight: 24,
+          color: colors.textSecondary,
+          textAlign: "center",
+          marginBottom: 28,
+          paddingHorizontal: 8,
+        },
+        ctaCard: {
+          backgroundColor: colors.appBackground,
+          borderRadius: 16,
+          paddingVertical: 18,
+          paddingHorizontal: 20,
+          borderWidth: 1,
+          borderColor: colors.border,
+        },
+      }),
+    [colors]
+  );
 
   return (
     <View style={styles.container}>
@@ -41,60 +83,3 @@ export default function EmptyStateTemplate({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: "center",
-    paddingHorizontal: 8,
-  },
-  iconRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 20,
-    gap: 8,
-  },
-  emoji: {
-    fontSize: 56,
-  },
-  emojiAccent: {
-    fontSize: 32,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: AppColors.TextDark,
-    textAlign: "center",
-    marginBottom: 12,
-    paddingHorizontal: 16,
-  },
-  subtitle: {
-    fontSize: 16,
-    lineHeight: 24,
-    color: AppColors.SlateGray,
-    textAlign: "center",
-    marginBottom: 28,
-    paddingHorizontal: 8,
-  },
-  ctaCard: {
-    backgroundColor: AppColors.AppBackground,
-    borderRadius: 16,
-    paddingVertical: 18,
-    paddingHorizontal: 20,
-    borderWidth: 1,
-    borderColor: "rgba(10, 126, 164, 0.2)",
-  },
-});
-
-/** Use these inside ctaContent for consistent CTA text styling */
-export const emptyStateCtaStyles = {
-  text: {
-    fontSize: 15,
-    color: AppColors.SlateGray,
-    textAlign: "center" as const,
-  },
-  highlight: {
-    fontWeight: "700" as const,
-    color: AppColors.BrandBlue,
-  },
-};

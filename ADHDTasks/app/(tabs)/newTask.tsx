@@ -10,13 +10,31 @@ import {
   setActiveTask,
   TaskItem,
 } from "../data/tasks";
-import { AppColors } from "../components/ui/ThemeColors";
+import { useTheme } from "../context/ThemeContext";
 import CreateTaskForm from "../components/create-task-form";
 
 const MAX_TASKS = 3;
 
 export default function NewTask() {
   const router = useRouter();
+  const { colors } = useTheme();
+  const styles = React.useMemo(
+    () =>
+      StyleSheet.create({
+        container: {
+          flex: 1,
+          backgroundColor: colors.background,
+          padding: 16,
+        },
+        header: { marginTop: 14, marginBottom: 16 },
+        greeting: {
+          fontSize: 32,
+          fontWeight: "600",
+          color: colors.text,
+        },
+      }),
+    [colors],
+  );
 
   const handleAddTask = async (taskName: string, durationMinutes: number) => {
     const newTask: TaskItem = {
@@ -65,21 +83,3 @@ export default function NewTask() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: AppColors.White,
-    padding: 16,
-    //justifyContent: "center",
-  },
-  header: {
-    marginTop: 14,
-    marginBottom: 16,
-  },
-  greeting: {
-    fontSize: 32,
-    fontWeight: "600",
-    color: AppColors.TextDark,
-  },
-});

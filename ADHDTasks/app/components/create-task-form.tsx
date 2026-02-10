@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import { AppColors } from "./ui/ThemeColors";
+import { useTheme } from "../context/ThemeContext";
 
 type CreateTaskFormProps = {
   /** Called when the user submits or saves the form */
@@ -28,6 +28,7 @@ export default function CreateTaskForm({
   showCard = true,
   showHeading = true,
 }: CreateTaskFormProps) {
+  const { colors } = useTheme();
   const [taskName, setTaskName] = useState(initialTaskName);
   const [durationMinutes, setDurationMinutes] = useState(
     initialDuration ? String(initialDuration) : ""
@@ -61,6 +62,126 @@ export default function CreateTaskForm({
     }
   };
 
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        card: {
+          backgroundColor: colors.cardMuted,
+          borderRadius: 20,
+          padding: 28,
+          
+        },
+        noPadding: {},
+        heading: {
+          fontSize: 26,
+          fontWeight: "700",
+          color: colors.text,
+          marginBottom: 24,
+          lineHeight: 34,
+        },
+        fieldLabel: {
+          fontSize: 13,
+          fontWeight: "600",
+          color: colors.textSecondary,
+          marginBottom: 8,
+          textTransform: "uppercase",
+          letterSpacing: 0.5,
+        },
+        taskNameInput: {
+          backgroundColor: "transparent",
+          paddingHorizontal: 0,
+          paddingVertical: 0,
+          fontSize: 20,
+          color: colors.text,
+          marginBottom: 40,
+          fontWeight: "700",
+        },
+        timeRow: {
+          flexDirection: "row",
+          alignItems: "center",
+          backgroundColor: colors.inputBg,
+          borderRadius: 14,
+          paddingHorizontal: 16,
+          paddingVertical: 12,
+          borderWidth: 1.5,
+          borderColor: colors.borderLight,
+          marginBottom: 12,
+        },
+        timeInput: {
+          flex: 1,
+          fontSize: 18,
+          color: colors.text,
+          fontWeight: "600",
+          paddingVertical: 0,
+        },
+        timeSuffix: {
+          fontSize: 15,
+          color: colors.textMuted,
+          fontWeight: "500",
+          marginLeft: 8,
+        },
+        chipRow: {
+          flexDirection: "row",
+          flexWrap: "wrap",
+          gap: 10,
+          marginBottom: 24,
+        },
+        chip: {
+          borderWidth: 1.5,
+          borderColor: colors.borderLight,
+          backgroundColor: colors.card,
+          paddingHorizontal: 12,
+          paddingVertical: 10,
+          borderRadius: 999,
+        },
+        chipActive: {
+          borderColor: colors.text,
+          backgroundColor: colors.text,
+        },
+        chipText: {
+          fontSize: 14,
+          color: colors.textSecondary,
+          fontWeight: "600",
+        },
+        chipTextActive: { color: colors.background },
+        submitButton: {
+          backgroundColor: colors.text,
+          paddingVertical: 20,
+          borderRadius: 14,
+          alignItems: "center",
+        },
+        submitButtonText: {
+          color: colors.background,
+          fontSize: 20,
+          fontWeight: "700",
+        },
+        editActions: { flexDirection: "row", gap: 12 },
+        actionButton: {
+          flex: 1,
+          paddingVertical: 16,
+          borderRadius: 14,
+          alignItems: "center",
+        },
+        actionButtonOutline: {
+          borderWidth: 1.5,
+          borderColor: colors.border,
+          backgroundColor: colors.card,
+        },
+        actionButtonOutlineText: {
+          fontSize: 16,
+          color: colors.textSecondary,
+          fontWeight: "600",
+        },
+        actionButtonFilled: { backgroundColor: colors.text },
+        actionButtonFilledText: {
+          fontSize: 16,
+          color: colors.background,
+          fontWeight: "600",
+        },
+      }),
+    [colors]
+  );
+
   const content = (
     <>
       {!isEditMode && showHeading && (
@@ -71,7 +192,7 @@ export default function CreateTaskForm({
       <TextInput
         style={styles.taskNameInput}
         placeholder="What do you need to do?"
-        placeholderTextColor={AppColors.MutedGray}
+        placeholderTextColor={colors.textMuted}
         value={taskName}
         onChangeText={handleTaskNameChange}
         autoCapitalize="sentences"
@@ -91,7 +212,7 @@ export default function CreateTaskForm({
         <TextInput
           style={styles.timeInput}
           placeholder="10"
-          placeholderTextColor={AppColors.MutedGray}
+          placeholderTextColor={colors.textMuted}
           value={durationMinutes}
           onChangeText={setDurationMinutes}
           keyboardType="number-pad"
@@ -151,132 +272,3 @@ export default function CreateTaskForm({
 
   return <View style={styles.card}>{content}</View>;
 }
-
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: AppColors.White,
-    borderRadius: 20,
-    padding: 28,
-    shadowColor: AppColors.Black,
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 3,
-  },
-  noPadding: {},
-  heading: {
-    fontSize: 26,
-    fontWeight: "700",
-    color: AppColors.TextDark,
-    marginBottom: 24,
-    lineHeight: 34,
-  },
-  fieldLabel: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: AppColors.SlateGray,
-    marginBottom: 8,
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-  },
-  taskNameInput: {
-    backgroundColor: "transparent",
-    paddingHorizontal: 0,
-    paddingVertical: 0,
-    fontSize: 20,
-    color: AppColors.TextDark,
-    marginBottom: 40,
-fontWeight: "700",    //minHeight: 24,
-  },
-  timeRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: AppColors.OffWhite,
-    borderRadius: 14,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderWidth: 1.5,
-    borderColor: AppColors.LightGray,
-    marginBottom: 12,
-  },
-  timeInput: {
-    flex: 1,
-    fontSize: 18,
-    color: AppColors.TextDark,
-    fontWeight: "600",
-    paddingVertical: 0,
-  },
-  timeSuffix: {
-    fontSize: 15,
-    color: AppColors.MutedGray,
-    fontWeight: "500",
-    marginLeft: 8,
-  },
-  chipRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-    marginBottom: 24,
-  },
-  chip: {
-    borderWidth: 1.5,
-    borderColor: AppColors.LightGray,
-    backgroundColor: AppColors.White,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderRadius: 999,
-  },
-  chipActive: {
-    borderColor: AppColors.TextDark,
-    backgroundColor: AppColors.TextDark,
-  },
-  chipText: {
-    fontSize: 14,
-    color: AppColors.Ink,
-    fontWeight: "600",
-  },
-  chipTextActive: {
-    color: AppColors.White,
-  },
-  // Single submit button (create mode)
-  submitButton: {
-    backgroundColor: AppColors.TextDark,
-    paddingVertical: 20,
-    borderRadius: 14,
-    alignItems: "center",
-  },
-  submitButtonText: {
-    color: AppColors.White,
-    fontSize: 20,
-    fontWeight: "700",
-  },
-  // Cancel + Save row (edit mode)
-  editActions: {
-    flexDirection: "row",
-    gap: 12,
-  },
-  actionButton: {
-    flex: 1,
-    paddingVertical: 16,
-    borderRadius: 14,
-    alignItems: "center",
-  },
-  actionButtonOutline: {
-    borderWidth: 1.5,
-    borderColor: AppColors.BorderGray,
-    backgroundColor: AppColors.White,
-  },
-  actionButtonOutlineText: {
-    fontSize: 16,
-    color: AppColors.Ink,
-    fontWeight: "600",
-  },
-  actionButtonFilled: {
-    backgroundColor: AppColors.TextDark,
-  },
-  actionButtonFilledText: {
-    fontSize: 16,
-    color: AppColors.White,
-    fontWeight: "600",
-  },
-});

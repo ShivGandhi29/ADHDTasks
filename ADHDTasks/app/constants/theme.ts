@@ -1,59 +1,126 @@
 /**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
+ * App theme palettes. Use with useTheme() to get the active palette.
  */
 
-import { Platform } from 'react-native';
+export type Theme = "light" | "dark";
+export type ThemePreference = Theme | "system";
 
-import { AppColors } from "../components/ui/ThemeColors";
+export type AppPalette = {
+  background: string;
+  card: string;
+  cardMuted: string;
+  text: string;
+  textSecondary: string;
+  textMuted: string;
+  border: string;
+  borderLight: string;
+  inputBg: string;
+  brand: string;
+  alert: string;
+  accentRed: string;
+  appBackground: string;
+  surface: string;
+  shadow: string;
+  white: string;
+  black: string;
+  /** Tab bar / icon default */
+  icon: string;
+  iconMuted: string;
+};
 
-const tintColorLight = AppColors.BrandBlue;
-const tintColorDark = AppColors.White;
+const lightPalette: AppPalette = {
+  background: "#FFFFFF",
+  card: "#FFFFFF",
+  cardMuted: "#F8F8F8",
+  text: "#111111",
+  textSecondary: "#222222",
+  textMuted: "#888888",
+  border: "#DDDDDD",
+  borderLight: "#E6E6E6",
+  inputBg: "#F8F8F8",
+  brand: "#0A7EA4",
+  alert: "#E5484D",
+  accentRed: "#A30000",
+  appBackground: "#E6F4FE",
+  surface: "#F2F2F2",
+  shadow: "#000000",
+  white: "#FFFFFF",
+  black: "#000000",
+  icon: "#687076",
+  iconMuted: "#9BA1A6",
+};
 
+const darkPalette: AppPalette = {
+  background: "#151718",
+  card: "#222425",
+  cardMuted: "#1C1D1E",
+  text: "#ECEDEE",
+  textSecondary: "#C8C9CA",
+  textMuted: "#9BA1A6",
+  border: "#3D4043",
+  borderLight: "#2D3032",
+  inputBg: "#222425",
+  brand: "#4DB8E2",
+  alert: "#E5484D",
+  accentRed: "#FF6B6B",
+  appBackground: "#0D1F2D",
+  surface: "#1C1D1E",
+  shadow: "#000000",
+  white: "#FFFFFF",
+  black: "#000000",
+  icon: "#9BA1A6",
+  iconMuted: "#687076",
+};
+
+export const palettes: Record<Theme, AppPalette> = {
+  light: lightPalette,
+  dark: darkPalette,
+};
+
+/** Legacy shape for useThemeColor / ThemedText */
 export const Colors = {
   light: {
-    text: AppColors.TextDarker,
-    background: AppColors.White,
-    tint: tintColorLight,
-    icon: AppColors.IconGray,
-    tabIconDefault: AppColors.IconGray,
-    tabIconSelected: tintColorLight,
+    text: lightPalette.text,
+    background: lightPalette.background,
+    tint: lightPalette.brand,
+    icon: lightPalette.icon,
+    tabIconDefault: lightPalette.icon,
+    tabIconSelected: lightPalette.brand,
   },
   dark: {
-    text: AppColors.TextLight,
-    background: AppColors.BackgroundDark,
-    tint: tintColorDark,
-    icon: AppColors.IconGrayLight,
-    tabIconDefault: AppColors.IconGrayLight,
-    tabIconSelected: tintColorDark,
+    text: darkPalette.text,
+    background: darkPalette.background,
+    tint: darkPalette.brand,
+    icon: darkPalette.icon,
+    tabIconDefault: darkPalette.icon,
+    tabIconSelected: darkPalette.brand,
   },
 };
 
-export const Fonts = Platform.select({
-  ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
-    mono: 'ui-monospace',
-  },
-  default: {
-    sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
-    mono: 'monospace',
-  },
-  web: {
-    sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-    serif: "Georgia, 'Times New Roman', serif",
-    rounded: "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
-    mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
-  },
-});
-
-export default function ThemeScreen() {
-  return null;
+/** Legacy: map palette to old AppColors keys for gradual migration if needed */
+export function paletteToLegacyKeys(p: AppPalette) {
+  return {
+    Black: p.black,
+    White: p.white,
+    OffWhite: p.cardMuted,
+    WhiteSmoke: p.surface,
+    LightGray: p.borderLight,
+    BorderGray: p.border,
+    MutedGray: p.textMuted,
+    SlateGray: p.textSecondary,
+    Charcoal: p.textSecondary,
+    Ink: p.textSecondary,
+    TextDark: p.text,
+    TextDarker: p.text,
+    IconGray: p.icon,
+    IconGrayLight: p.iconMuted,
+    BackgroundDark: p.background,
+    TextLight: p.text,
+    BrandBlue: p.brand,
+    AlertRed: p.alert,
+    AccentRed: p.accentRed,
+    AppBackground: p.appBackground,
+  };
 }
+
+export default palettes;
