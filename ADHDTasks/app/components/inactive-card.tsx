@@ -8,6 +8,7 @@ type InactiveCardProps = {
   durationMinutes: number;
   onDelete: () => void;
   onActivate: () => void;
+  onMoveToToDo?: () => void;
   expanded?: boolean;
   onCardPress?: () => void;
 };
@@ -17,6 +18,7 @@ export default function InactiveCard({
   durationMinutes,
   onDelete,
   onActivate,
+  onMoveToToDo,
   expanded = false,
   onCardPress,
 }: InactiveCardProps) {
@@ -48,8 +50,13 @@ export default function InactiveCard({
           marginBottom: 6,
         },
         metaText: { fontSize: 14, color: colors.textSecondary },
-        startNowButton: {
+        buttonRow: {
+          flexDirection: "row",
+          gap: 10,
           marginTop: 12,
+        },
+        startNowButton: {
+          flex: 1,
           backgroundColor: colors.text,
           paddingVertical: 10,
           borderRadius: 10,
@@ -60,8 +67,22 @@ export default function InactiveCard({
           fontSize: 14,
           fontWeight: "600",
         },
+        moveToToDoButton: {
+          flex: 1,
+          //borderWidth: 1.5,
+          //borderColor: colors.border,
+          backgroundColor: colors.card,
+          paddingVertical: 10,
+          borderRadius: 10,
+          alignItems: "center",
+        },
+        moveToToDoText: {
+          color: colors.textSecondary,
+          fontSize: 14,
+          fontWeight: "600",
+        },
       }),
-    [colors]
+    [colors],
   );
 
   const renderRightActions = () => (
@@ -79,9 +100,19 @@ export default function InactiveCard({
           <Text style={styles.taskText}>{task}</Text>
           <Text style={styles.metaText}>{durationMinutes} min</Text>
           {expanded && (
-            <Pressable style={styles.startNowButton} onPress={onActivate}>
-              <Text style={styles.startNowText}>Activate</Text>
-            </Pressable>
+            <View style={styles.buttonRow}>
+              <Pressable style={styles.startNowButton} onPress={onActivate}>
+                <Text style={styles.startNowText}>Activate</Text>
+              </Pressable>
+              {onMoveToToDo && (
+                <Pressable
+                  style={styles.moveToToDoButton}
+                  onPress={onMoveToToDo}
+                >
+                  <Text style={styles.moveToToDoText}>Move to Tasks</Text>
+                </Pressable>
+              )}
+            </View>
           )}
         </View>
       </Pressable>

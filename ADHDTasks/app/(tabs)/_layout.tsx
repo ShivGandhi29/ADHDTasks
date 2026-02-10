@@ -13,7 +13,7 @@ export default function TabLayout() {
           <Icon sf="bolt.fill" />
         </NativeTabs.Trigger>
         <NativeTabs.Trigger name="toDoList">
-          <Label>To Do</Label>
+          <Label>Tasks</Label>
           <Icon sf="list.bullet" />
         </NativeTabs.Trigger>
         <NativeTabs.Trigger name="newTask" role="search">
@@ -60,7 +60,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="toDoList"
         options={{
-          title: "To Do",
+          title: "Tasks",
           tabBarIcon: ({ color, size }) => (
             <IconSymbol name="list.bullet" color={color} size={size} />
           ),

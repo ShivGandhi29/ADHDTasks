@@ -143,6 +143,16 @@ export default function HomeScreen() {
     loadTasks();
   };
 
+  const handleMoveToToDo = useCallback(
+    async (item: TaskItem) => {
+      setExpandedInactiveId(null);
+      await addToDoListTask(item);
+      await removeTask(item.id);
+      loadTasks();
+    },
+    [loadTasks],
+  );
+
   const handleActivateInactive = (task: TaskItem) => {
     if (activeTask && activeTask.task !== task.name) {
       Alert.alert(
@@ -269,6 +279,7 @@ export default function HomeScreen() {
                 durationMinutes={item.durationMinutes}
                 onDelete={() => handleDeleteInactive(item.id)}
                 onActivate={() => handleActivateInactive(item)}
+                onMoveToToDo={() => handleMoveToToDo(item)}
                 expanded={expandedInactiveId === item.id}
                 onCardPress={() => handleInactiveCardPress(item.id)}
               />

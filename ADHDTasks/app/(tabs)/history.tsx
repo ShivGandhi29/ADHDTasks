@@ -14,6 +14,7 @@ import PastCard from "../components/past-card";
 import IconSymbol from "../components/ui/icon-symbol";
 import {
   addTask,
+  addToDoListTask,
   getActiveTask,
   getHistoryTasks,
   getTasks,
@@ -122,6 +123,17 @@ export default function History() {
     setExpandedTaskId((current) => (current === itemId ? null : itemId));
   }, []);
 
+  const handleMoveToToDo = useCallback(async (item: TaskItem) => {
+    const task: TaskItem = {
+      id: `${Date.now()}`,
+      name: item.name,
+      durationMinutes: item.durationMinutes,
+      createdAt: new Date().toISOString(),
+    };
+    await addToDoListTask(task);
+    setExpandedTaskId(null);
+  }, []);
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -164,6 +176,7 @@ export default function History() {
                 durationMinutes={item.durationMinutes}
                 onDelete={() => handleDelete(item.id)}
                 onReactivate={() => handleAddFromHistory(item)}
+                onMoveToToDo={() => handleMoveToToDo(item)}
                 reactivateLabel="Add to Up Next"
                 expanded={expandedTaskId === item.id}
                 onCardPress={() => handleCardPress(item.id)}

@@ -9,6 +9,7 @@ type PastCardProps = {
   durationMinutes: number;
   onDelete: () => void;
   onReactivate?: () => void;
+  onMoveToToDo?: () => void;
   /** Label for the reactivate/add button (e.g. "Add") */
   reactivateLabel?: string;
   /** When true, card is expanded (e.g. show Add button) */
@@ -23,6 +24,7 @@ export default function PastCard({
   durationMinutes,
   onDelete,
   onReactivate,
+  onMoveToToDo,
   reactivateLabel = "Reactivate",
   expanded = false,
   onCardPress,
@@ -62,8 +64,13 @@ export default function PastCard({
           marginBottom: 6,
         },
         metaText: { fontSize: 14, color: colors.textSecondary },
-        reactivateButton: {
+        buttonRow: {
+          flexDirection: "row",
+          gap: 10,
           marginTop: 12,
+        },
+        reactivateButton: {
+          flex: 1,
           backgroundColor: colors.text,
           paddingVertical: 10,
           borderRadius: 10,
@@ -71,6 +78,18 @@ export default function PastCard({
         },
         reactivateText: {
           color: colors.background,
+          fontSize: 14,
+          fontWeight: "600",
+        },
+        moveToToDoButton: {
+          flex: 1,
+          backgroundColor: colors.card,
+          paddingVertical: 10,
+          borderRadius: 10,
+          alignItems: "center",
+        },
+        moveToToDoText: {
+          color: colors.textSecondary,
           fontSize: 14,
           fontWeight: "600",
         },
@@ -96,14 +115,23 @@ export default function PastCard({
         <Text style={styles.taskLabel}>{label}</Text>
         <Text style={styles.taskText}>{task}</Text>
         <Text style={styles.metaText}>{durationMinutes} min</Text>
-        {onReactivate && (expanded || !onCardPress) && (
-          <Pressable
-            style={styles.reactivateButton}
-            onPress={onReactivate}
-            hitSlop={8}
-          >
-            <Text style={styles.reactivateText}>{reactivateLabel}</Text>
-          </Pressable>
+        {(onReactivate || onMoveToToDo) && (expanded || !onCardPress) && (
+          <View style={styles.buttonRow}>
+            {onReactivate && (
+              <Pressable
+                style={styles.reactivateButton}
+                onPress={onReactivate}
+                hitSlop={8}
+              >
+                <Text style={styles.reactivateText}>{reactivateLabel}</Text>
+              </Pressable>
+            )}
+            {onMoveToToDo && (
+              <Pressable style={styles.moveToToDoButton} onPress={onMoveToToDo}>
+                <Text style={styles.moveToToDoText}>Move to Tasks</Text>
+              </Pressable>
+            )}
+          </View>
         )}
       </Pressable>
     </Swipeable>
