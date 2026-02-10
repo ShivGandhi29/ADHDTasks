@@ -30,6 +30,18 @@ Your ADHD to-do list. One task at a time.
 
 **Requirements for install:** Android SDK and `adb` (platform-tools). Enable USB debugging on the device.
 
+### Version (iOS)
+
+| Command | Description |
+|--------|-------------|
+| `yarn version:ios` | Bump **patch** (e.g. 1.0.0 → 1.0.1) and build. Default. |
+| `yarn version:ios:patch` | Same as above. |
+| `yarn version:ios:minor` | Bump **minor** (e.g. 1.0.0 → 1.1.0) and build. |
+| `yarn version:ios:major` | Bump **major** (e.g. 1.0.0 → 2.0.0) and build. |
+| `yarn version:ios:build-only` | Only bump **build** number; version string unchanged. |
+
+Or run the script directly: `./scripts/update-version-ios.sh [--patch|--minor|--major|--build-only]`. Updates: `app.json`, `package.json`, `ios/ADHDTasks/Info.plist`, and `ios/ADHDTasks.xcodeproj/project.pbxproj`.
+
 ### Other scripts
 
 | Command | Description |

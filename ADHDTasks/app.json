@@ -3,7 +3,7 @@
     "name": "Focusd",
     "slug": "focusd",
     "description": "Your ADHD to-do list. One task at a time.",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/iconComposer/logo-iOS-Dark-1024x1024@2x.png",
     "scheme": "adhdtasks",
