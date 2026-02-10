@@ -177,7 +177,10 @@ export default function Settings() {
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Appearance */}
         <Text style={[styles.sectionTitle, styles.sectionTitleFirst]}>
           Appearance

@@ -136,12 +136,9 @@ export default function ActiveCard({
           borderRadius: 20,
         },
         cardFullScreen: {
-          width: "100%",
-          borderRadius: 0,
-          shadowOpacity: 0,
-          shadowRadius: 0,
-          shadowOffset: { width: 0, height: 0 },
-          elevation: 0,
+         width: "100%",
+          borderRadius: 20,
+          
         },
         cardContent: { padding: 28 },
         cardContentCompact: { paddingTop: 16 },
@@ -156,7 +153,7 @@ export default function ActiveCard({
           textTransform: "uppercase",
           letterSpacing: 0.6,
         },
-        taskNameTouchable: { marginBottom: 28 },
+        taskNameTouchable: { marginBottom: 28, marginTop: 16 },
         taskText: {
           fontSize: 26,
           fontWeight: "700",
@@ -509,7 +506,7 @@ export default function ActiveCard({
         style={[
           styles.cardContent,
           !isRunning && styles.cardContentCompact,
-          isRunning && styles.cardContentFullScreen,
+          isRunning && styles.cardContentCompact,
         ]}
       >
         {cardBody}

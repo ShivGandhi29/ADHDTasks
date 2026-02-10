@@ -132,6 +132,7 @@ export default function ToDoList() {
           styles.content,
           tasks.length === 0 && styles.contentEmpty,
         ]}
+        showsVerticalScrollIndicator={false}
       >
         {tasks.length === 0 ? (
           <EmptyStateTemplate

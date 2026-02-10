@@ -141,6 +141,7 @@ export default function History() {
           styles.content,
           tasks.length === 0 && styles.contentEmpty,
         ]}
+        showsVerticalScrollIndicator={false}
       >
         {tasks.length === 0 ? (
           <EmptyStateTemplate

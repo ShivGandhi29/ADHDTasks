@@ -49,7 +49,7 @@ export default function HomeScreen() {
           fontWeight: "600",
           color: colors.text,
         },
-        contentFullScreen: { padding: 0 },
+        contentFullScreen: { padding: 16 },
         activeFullScreen: {},
       }),
     [colors]
@@ -269,6 +269,7 @@ export default function HomeScreen() {
           styles.content,
           isActiveRunning && styles.contentFullScreen,
         ]}
+        showsVerticalScrollIndicator={false}
       >
         {!isActiveRunning && (
           <View style={styles.header}>
