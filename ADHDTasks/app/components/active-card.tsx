@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  ScrollView,
   View,
   Text,
   TextInput,
   Pressable,
   StyleSheet,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { CountdownCircleTimer } from "react-native-countdown-circle-timer";
 import { playTimerEndAlarm } from "../utils/timer-alarm";
 import { AppColors } from "./ui/ThemeColors";
@@ -36,11 +36,14 @@ export default function ActiveCard({
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [remainingSeconds, setRemainingSeconds] = useState(durationSeconds);
+  const [currentDurationSeconds, setCurrentDurationSeconds] =
+    useState(durationSeconds);
   const [timerKey, setTimerKey] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
   const [editingNameValue, setEditingNameValue] = useState(task);
   const [isTimesUp, setIsTimesUp] = useState(false);
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     // Notify parent when running/paused state changes (not every second tick).
@@ -52,6 +55,7 @@ export default function ActiveCard({
 
   useEffect(() => {
     setRemainingSeconds(durationSeconds);
+    setCurrentDurationSeconds(durationSeconds);
     setTimerKey((current) => current + 1);
   }, [durationSeconds]);
 
@@ -68,6 +72,7 @@ export default function ActiveCard({
   const onStart = () => {
     if (remainingSeconds === 0) {
       setRemainingSeconds(durationSeconds);
+      setCurrentDurationSeconds(durationSeconds);
       setTimerKey((current) => current + 1);
     }
     setIsRunning(true);
@@ -97,9 +102,18 @@ export default function ActiveCard({
   const handleExtend = (extraMinutes: number) => {
     setIsTimesUp(false);
     setRemainingSeconds(extraMinutes * 60);
+    setCurrentDurationSeconds(extraMinutes * 60);
     setTimerKey((current) => current + 1);
     setIsRunning(true);
     setIsPaused(false);
+  };
+
+  const handleAddTime = (extraMinutes: number) => {
+    const extraSeconds = extraMinutes * 60;
+    const newRemaining = remainingSeconds + extraSeconds;
+    setRemainingSeconds(newRemaining);
+    setCurrentDurationSeconds(newRemaining);
+    setTimerKey((current) => current + 1);
   };
 
   const handleCancel = () => {
@@ -171,7 +185,7 @@ export default function ActiveCard({
           <CountdownCircleTimer
             key={timerKey}
             isPlaying={!isPaused}
-            duration={durationSeconds}
+            duration={currentDurationSeconds}
             initialRemainingTime={remainingSeconds}
             colors={[
               AppColors.TextDark,
@@ -179,8 +193,8 @@ export default function ActiveCard({
               AppColors.AccentRed,
             ]}
             colorsTime={[
-              durationSeconds,
-              Math.max(2, durationSeconds * 0.3),
+              currentDurationSeconds,
+              Math.max(2, currentDurationSeconds * 0.3),
               0,
             ]}
             strokeWidth={10}
@@ -259,6 +273,20 @@ export default function ActiveCard({
               </Pressable>
             </View>
           )}
+          <View style={styles.needMoreTimeSection}>
+            <Text style={styles.needMoreTimeLabel}>Need more time?</Text>
+            <View style={styles.needMoreTimeRow}>
+              {[5, 10, 15, 30].map((mins) => (
+                <Pressable
+                  key={mins}
+                  style={styles.needMoreTimeChip}
+                  onPress={() => handleAddTime(mins)}
+                >
+                  <Text style={styles.needMoreTimeChipText}>+{mins}m</Text>
+                </Pressable>
+              ))}
+            </View>
+          </View>
           <View style={styles.actionRow}>
             <Pressable
               style={[
@@ -295,19 +323,17 @@ export default function ActiveCard({
 
   return (
     <View style={[styles.card, isRunning && styles.cardFullScreen]}>
-      {isRunning ? (
-        <ScrollView
-          contentContainerStyle={[
-            styles.cardContent,
+      <View
+        style={[
+          styles.cardContent,
+          isRunning && [
             styles.cardContentFullScreen,
-          ]}
-          showsVerticalScrollIndicator={false}
-        >
-          {cardBody}
-        </ScrollView>
-      ) : (
-        <View style={styles.cardContent}>{cardBody}</View>
-      )}
+            
+          ],
+        ]}
+      >
+        {cardBody}
+      </View>
     </View>
   );
 }
@@ -323,7 +349,6 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   cardFullScreen: {
-    flex: 1,
     width: "100%",
     borderRadius: 0,
     shadowOpacity: 0,
@@ -417,6 +442,36 @@ const styles = StyleSheet.create({
     color: AppColors.SlateGray,
     fontWeight: "500",
     textDecorationLine: "underline",
+  },
+
+  // Need more time (while running)
+  needMoreTimeSection: {
+    marginBottom: 16,
+  },
+  needMoreTimeLabel: {
+    fontSize: 14,
+    color: AppColors.MutedGray,
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  needMoreTimeRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+    justifyContent: "center",
+  },
+  needMoreTimeChip: {
+    borderWidth: 1.5,
+    borderColor: AppColors.LightGray,
+    backgroundColor: AppColors.White,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 999,
+  },
+  needMoreTimeChipText: {
+    fontSize: 14,
+    color: AppColors.Ink,
+    fontWeight: "600",
   },
 
   // Running actions

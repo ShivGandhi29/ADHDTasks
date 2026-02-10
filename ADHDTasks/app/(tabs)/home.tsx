@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useFocusEffect, useRouter } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import ActiveCard from "../components/active-card";
 import InactiveCard from "../components/inactive-card";
 import CreateTaskForm from "../components/create-task-form";
@@ -19,6 +19,7 @@ import { syncWidgetWithTask } from "../utils/widget";
 import { AppColors } from "../components/ui/ThemeColors";
 
 export default function HomeScreen() {
+  const insets = useSafeAreaInsets();
   const [inactiveTasks, setInactiveTasks] = useState<TaskItem[]>([]);
   const [isActiveRunning, setIsActiveRunning] = useState(false);
   const [activeTask, setActiveTask] = useState<{
@@ -177,7 +178,6 @@ export default function HomeScreen() {
           styles.content,
           isActiveRunning && styles.contentFullScreen,
         ]}
-        scrollEnabled={!isActiveRunning}
       >
         {!isActiveRunning && (
           <View style={styles.header}>
@@ -240,10 +240,7 @@ const styles = StyleSheet.create({
     color: AppColors.TextDark,
   },
   contentFullScreen: {
-    flexGrow: 1,
     padding: 0,
   },
-  activeFullScreen: {
-    flex: 1,
-  },
+  activeFullScreen: {},
 });
