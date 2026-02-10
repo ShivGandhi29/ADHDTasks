@@ -1,7 +1,10 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useFocusEffect, useRouter } from "expo-router";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import ActiveCard from "../components/active-card";
 import InactiveCard from "../components/inactive-card";
 import CreateTaskForm from "../components/create-task-form";
@@ -26,6 +29,13 @@ export default function HomeScreen() {
     task: string;
     durationMinutes: number;
   } | null>(null);
+  const [expandedInactiveId, setExpandedInactiveId] = useState<string | null>(
+    null,
+  );
+
+  const handleInactiveCardPress = useCallback((itemId: string) => {
+    setExpandedInactiveId((current) => (current === itemId ? null : itemId));
+  }, []);
 
   const handleRunningChange = useCallback(
     (running: boolean, remainingSeconds: number) => {
@@ -38,11 +48,11 @@ export default function HomeScreen() {
             durationMinutes: activeTask.durationMinutes,
             createdAt: "",
           },
-          { isRunning: running, remainingSeconds }
+          { isRunning: running, remainingSeconds },
         );
       }
     },
-    [activeTask]
+    [activeTask],
   );
   const router = useRouter();
   const greeting = useMemo(() => {
@@ -56,7 +66,10 @@ export default function HomeScreen() {
     const [tasks, active] = await Promise.all([getTasks(), getActiveTask()]);
     setInactiveTasks(tasks);
     if (active) {
-      setActiveTask({ task: active.name, durationMinutes: active.durationMinutes });
+      setActiveTask({
+        task: active.name,
+        durationMinutes: active.durationMinutes,
+      });
       syncWidgetWithTask(active);
     } else {
       setActiveTask(null);
@@ -66,7 +79,7 @@ export default function HomeScreen() {
   useFocusEffect(
     useCallback(() => {
       loadTasks();
-    }, [loadTasks])
+    }, [loadTasks]),
   );
 
   const handleDeleteInactive = (taskId: string) => {
@@ -76,6 +89,7 @@ export default function HomeScreen() {
         text: "Delete",
         style: "destructive",
         onPress: async () => {
+          setExpandedInactiveId(null);
           await removeTask(taskId);
           loadTasks();
         },
@@ -93,6 +107,7 @@ export default function HomeScreen() {
       };
       await addTask(previousActive);
     }
+    setExpandedInactiveId(null);
     setActiveTask({ task: task.name, durationMinutes: task.durationMinutes });
     await setActiveTaskStorage(task);
     await removeTask(task.id);
@@ -111,7 +126,7 @@ export default function HomeScreen() {
             style: "destructive",
             onPress: () => activateInactiveTask(task),
           },
-        ]
+        ],
       );
       return;
     }
@@ -203,6 +218,7 @@ export default function HomeScreen() {
         )}
         {!isActiveRunning && inactiveTasks.length > 0 && (
           <View style={styles.list}>
+            <Text style={styles.upNextHeader}>Up next</Text>
             {inactiveTasks.map((item) => (
               <InactiveCard
                 key={item.id}
@@ -210,6 +226,8 @@ export default function HomeScreen() {
                 durationMinutes={item.durationMinutes}
                 onDelete={() => handleDeleteInactive(item.id)}
                 onActivate={() => handleActivateInactive(item)}
+                expanded={expandedInactiveId === item.id}
+                onCardPress={() => handleInactiveCardPress(item.id)}
               />
             ))}
           </View>
@@ -229,6 +247,16 @@ const styles = StyleSheet.create({
   },
   list: {
     gap: 12,
+  },
+  upNextHeader: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: AppColors.Ink,
+    textTransform: "uppercase",
+    letterSpacing: 5,
+    marginBottom: 8,
+    marginTop: 16,
+    textAlign: "center",
   },
   header: {
     marginTop: 14,

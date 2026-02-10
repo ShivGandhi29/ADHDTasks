@@ -3,11 +3,22 @@ import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useFocusEffect } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import PastCard from "../components/past-card";
-import { getHistoryTasks, removeHistoryTask, TaskItem } from "../data/tasks";
+import {
+  addTask,
+  getActiveTask,
+  getHistoryTasks,
+  getTasks,
+  removeHistoryTask,
+  setActiveTask,
+  TaskItem,
+} from "../data/tasks";
 import { AppColors } from "../components/ui/ThemeColors";
+
+const MAX_TASKS = 3;
 
 export default function History() {
   const [tasks, setTasks] = useState<TaskItem[]>([]);
+  const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
 
   const loadTasks = useCallback(async () => {
     const existing = await getHistoryTasks();
@@ -37,6 +48,46 @@ export default function History() {
     ]);
   };
 
+  const handleAddFromHistory = useCallback(async (item: TaskItem) => {
+    const [active, inactiveTasks] = await Promise.all([
+      getActiveTask(),
+      getTasks(),
+    ]);
+    const isSameTask = (t: TaskItem) =>
+      t.name === item.name && t.durationMinutes === item.durationMinutes;
+    const alreadyInActive =
+      active && isSameTask(active);
+    const alreadyInInactive = inactiveTasks.some(isSameTask);
+    if (alreadyInActive || alreadyInInactive) {
+      Alert.alert("Already in active tasks", undefined, [{ text: "OK" }]);
+      return;
+    }
+    const totalCount = (active ? 1 : 0) + inactiveTasks.length;
+    if (totalCount >= MAX_TASKS) {
+      Alert.alert(
+        "Too many tasks",
+        "Please complete your current tasks before adding a new one."
+      );
+      return;
+    }
+    const task: TaskItem = {
+      id: `${Date.now()}`,
+      name: item.name,
+      durationMinutes: item.durationMinutes,
+      createdAt: new Date().toISOString(),
+    };
+    if (!active) {
+      await setActiveTask(task);
+    } else {
+      await addTask(task);
+    }
+    setExpandedTaskId(null);
+  }, []);
+
+  const handleCardPress = useCallback((itemId: string) => {
+    setExpandedTaskId((current) => (current === itemId ? null : itemId));
+  }, []);
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
@@ -50,6 +101,10 @@ export default function History() {
                 task={item.name}
                 durationMinutes={item.durationMinutes}
                 onDelete={() => handleDelete(item.id)}
+                onReactivate={() => handleAddFromHistory(item)}
+                reactivateLabel="Add to Up Next"
+                expanded={expandedTaskId === item.id}
+                onCardPress={() => handleCardPress(item.id)}
               />
             ))}
           </View>

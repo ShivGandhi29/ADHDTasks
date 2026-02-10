@@ -135,7 +135,6 @@ export default function ActiveCard({
 
   const cardBody = (
     <>
-      <Text style={styles.taskLabel}>Right now</Text>
 
       {isEditing ? (
         <CreateTaskForm

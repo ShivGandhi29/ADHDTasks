@@ -8,6 +8,12 @@ type PastCardProps = {
   durationMinutes: number;
   onDelete: () => void;
   onReactivate?: () => void;
+  /** Label for the reactivate/add button (e.g. "Add") */
+  reactivateLabel?: string;
+  /** When true, card is expanded (e.g. show Add button) */
+  expanded?: boolean;
+  /** Called when the card content is tapped (to expand/collapse) */
+  onCardPress?: () => void;
 };
 
 export default function PastCard({
@@ -15,6 +21,9 @@ export default function PastCard({
   durationMinutes,
   onDelete,
   onReactivate,
+  reactivateLabel = "Reactivate",
+  expanded = false,
+  onCardPress,
 }: PastCardProps) {
   const renderRightActions = () => (
     <View style={styles.deleteContainer}>
@@ -26,16 +35,24 @@ export default function PastCard({
 
   return (
     <Swipeable renderRightActions={renderRightActions}>
-      <View style={styles.card}>
+      <Pressable
+        style={styles.card}
+        onPress={onCardPress}
+        disabled={!onCardPress}
+      >
         <Text style={styles.taskLabel}>Past task</Text>
         <Text style={styles.taskText}>{task}</Text>
         <Text style={styles.metaText}>{durationMinutes} min</Text>
-        {onReactivate && (
-          <Pressable style={styles.reactivateButton} onPress={onReactivate}>
-            <Text style={styles.reactivateText}>Reactivate</Text>
+        {onReactivate && (expanded || !onCardPress) && (
+          <Pressable
+            style={styles.reactivateButton}
+            onPress={onReactivate}
+            hitSlop={8}
+          >
+            <Text style={styles.reactivateText}>{reactivateLabel}</Text>
           </Pressable>
         )}
-      </View>
+      </Pressable>
     </Swipeable>
   );
 }
