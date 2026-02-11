@@ -16,7 +16,7 @@ import { ThemeProvider, useTheme } from "./context/ThemeContext";
 // Keep the splash visible until we explicitly hide it (after a minimum delay)
 SplashScreen.preventAutoHideAsync();
 
-const SPLASH_MIN_VISIBLE_MS = 2500;
+const SPLASH_MIN_VISIBLE_MS = 1500;
 
 export const unstable_settings = {
   anchor: "(tabs)",
