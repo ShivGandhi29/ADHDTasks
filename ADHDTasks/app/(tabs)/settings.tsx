@@ -247,12 +247,7 @@ export default function Settings() {
         card: {
           backgroundColor: colors.cardMuted,
           borderRadius: 12,
-          overflow: "hidden",
-          shadowColor: colors.shadow,
-          shadowOffset: { width: 0, height: 1 },
-          shadowOpacity: 0.06,
-          shadowRadius: 4,
-          elevation: 2,
+          
         },
         row: {
           flexDirection: "row",
