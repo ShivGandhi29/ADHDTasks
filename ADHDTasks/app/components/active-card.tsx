@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { CountdownCircleTimer } from "react-native-countdown-circle-timer";
-import { playTimerEndAlarm } from "../utils/timer-alarm";
+import { playTimerEndAlarm, stopTimerAlarm } from "../utils/timer-alarm";
 import { useTheme } from "../context/ThemeContext";
 import CreateTaskForm from "./create-task-form";
 
@@ -102,6 +102,7 @@ export default function ActiveCard({
   };
 
   const handleComplete = () => {
+    stopTimerAlarm();
     setIsTimesUp(false);
     setIsManuallyCompleted(false);
     setIsRunning(false);

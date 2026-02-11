@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   StyleSheet,
   Text,
@@ -6,11 +6,25 @@ import {
   Pressable,
   ScrollView,
   Alert,
+  Switch,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Audio } from "expo-av";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useTheme } from "../context/ThemeContext";
 import type { PaletteSetName } from "../constants/theme";
+import {
+  type CompleteTaskSoundId,
+  COMPLETE_TASK_SOUND_OPTIONS,
+  COMPLETE_TASK_SOUND_SOURCES,
+  DEFAULT_COMPLETE_TASK_SOUND,
+} from "../constants/sounds";
+
+const PREVIEW_DURATION_MS = 10_000;
+
+const ALARM_ENABLED_KEY = "@adhdtasks/alarm_enabled";
+const COMPLETE_TASK_SOUND_KEY = "@adhdtasks/complete_task_sound";
 
 type ThemeOption = "light" | "dark" | "system";
 
@@ -34,6 +48,137 @@ const PALETTE_OPTIONS: { value: PaletteSetName; label: string }[] = [
 
 export default function Settings() {
   const { colors, themePreference, setThemePreference, paletteSet, setPaletteSet } = useTheme();
+  const [alarmEnabled, setAlarmEnabledState] = useState(true);
+  const [completeTaskSound, setCompleteTaskSoundState] =
+    useState<CompleteTaskSoundId>(DEFAULT_COMPLETE_TASK_SOUND);
+  const [previewingSoundId, setPreviewingSoundId] =
+    useState<CompleteTaskSoundId | null>(null);
+  const [isPreviewPaused, setIsPreviewPaused] = useState(false);
+  const soundRef = useRef<Audio.Sound | null>(null);
+  const previewTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const stopPreview = useCallback(async () => {
+    if (previewTimerRef.current != null) {
+      clearTimeout(previewTimerRef.current);
+      previewTimerRef.current = null;
+    }
+    const sound = soundRef.current;
+    if (sound != null) {
+      try {
+        await sound.stopAsync();
+        await sound.unloadAsync();
+      } catch {
+        // ignore
+      }
+      soundRef.current = null;
+    }
+    setPreviewingSoundId(null);
+    setIsPreviewPaused(false);
+  }, []);
+
+  const startPreview = useCallback(async (id: CompleteTaskSoundId) => {
+    await stopPreview();
+    const source = COMPLETE_TASK_SOUND_SOURCES[id];
+    if (source == null) return;
+    try {
+      await Audio.setAudioModeAsync({
+        playsInSilentModeIOS: true,
+        staysActiveInBackground: false,
+        shouldDuckAndroid: true,
+        playThroughEarpieceAndroid: false,
+      });
+      const { sound } = await Audio.Sound.createAsync(
+        source as Parameters<typeof Audio.Sound.createAsync>[0],
+      );
+      soundRef.current = sound;
+      setPreviewingSoundId(id);
+      setIsPreviewPaused(false);
+      await sound.playAsync();
+      sound.setOnPlaybackStatusUpdate((status) => {
+        if (status.isLoaded && status.didJustFinish) {
+          stopPreview();
+        }
+      });
+      previewTimerRef.current = setTimeout(() => {
+        previewTimerRef.current = null;
+        stopPreview();
+      }, PREVIEW_DURATION_MS);
+    } catch {
+      setPreviewingSoundId(null);
+    }
+  }, [stopPreview]);
+
+  const handlePlayPausePreview = useCallback(
+    async (id: CompleteTaskSoundId) => {
+      const sound = soundRef.current;
+      if (previewingSoundId === id) {
+        if (isPreviewPaused && sound != null) {
+          await sound.playFromPositionAsync(0);
+          setIsPreviewPaused(false);
+          previewTimerRef.current = setTimeout(() => {
+            previewTimerRef.current = null;
+            stopPreview();
+          }, PREVIEW_DURATION_MS);
+        } else if (!isPreviewPaused && sound != null) {
+          await sound.pauseAsync();
+          setIsPreviewPaused(true);
+          if (previewTimerRef.current != null) {
+            clearTimeout(previewTimerRef.current);
+            previewTimerRef.current = null;
+          }
+        }
+        return;
+      }
+      await startPreview(id);
+    },
+    [previewingSoundId, isPreviewPaused, startPreview, stopPreview],
+  );
+
+  useEffect(() => {
+    return () => {
+      if (previewTimerRef.current != null) clearTimeout(previewTimerRef.current);
+      soundRef.current?.unloadAsync().catch(() => {});
+    };
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const [storedAlarm, storedSound] = await Promise.all([
+          AsyncStorage.getItem(ALARM_ENABLED_KEY),
+          AsyncStorage.getItem(COMPLETE_TASK_SOUND_KEY),
+        ]);
+        if (storedAlarm === "false") setAlarmEnabledState(false);
+        else if (storedAlarm === "true") setAlarmEnabledState(true);
+        if (
+          storedSound != null &&
+          COMPLETE_TASK_SOUND_OPTIONS.some((o) => o.value === storedSound)
+        ) {
+          setCompleteTaskSoundState(storedSound as CompleteTaskSoundId);
+        }
+      } catch {
+        // keep default
+      }
+    })();
+  }, []);
+
+  const setCompleteTaskSound = useCallback(async (value: CompleteTaskSoundId) => {
+    setCompleteTaskSoundState(value);
+    try {
+      await AsyncStorage.setItem(COMPLETE_TASK_SOUND_KEY, value);
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const setAlarmEnabled = useCallback(async (value: boolean) => {
+    setAlarmEnabledState(value);
+    try {
+      await AsyncStorage.setItem(ALARM_ENABLED_KEY, value ? "true" : "false");
+    } catch {
+      // ignore
+    }
+  }, []);
 
   function SettingsRow({
     icon,
@@ -84,8 +229,8 @@ export default function Settings() {
           backgroundColor: colors.background,
         },
         content: {
-          padding: 16,
-          paddingBottom: 32,
+          padding: 24,
+          gap: 16,
         },
         sectionTitle: {
           fontSize: 13,
@@ -131,6 +276,10 @@ export default function Settings() {
           alignItems: "center",
           paddingVertical: 10,
           gap: 12,
+        },
+        previewButton: {
+          padding: 8,
+          marginRight: 4,
         },
         themeRadio: {
           width: 22,
@@ -189,7 +338,7 @@ export default function Settings() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
+    <SafeAreaView style={styles.container}>
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
@@ -295,6 +444,85 @@ export default function Settings() {
               );
             })}
           </View>
+        </View>
+
+        {/* Sounds */}
+        <Text style={styles.sectionTitle}>Sounds</Text>
+        <View style={styles.card}>
+          <View
+            style={[
+              styles.row,
+              alarmEnabled && {
+                borderBottomWidth: StyleSheet.hairlineWidth,
+                borderBottomColor: colors.border,
+              },
+            ]}
+          >
+            <MaterialIcons name="alarm" size={22} color={colors.textSecondary} />
+            <Text style={[styles.rowLabel, { color: colors.text }]}>Alarm</Text>
+            <Switch
+              value={alarmEnabled}
+              onValueChange={setAlarmEnabled}
+              trackColor={{ false: colors.border, true: colors.brand }}
+              thumbColor={colors.white}
+            />
+          </View>
+          {alarmEnabled && (
+            <>
+
+              <View style={styles.themeOptions}>
+                {COMPLETE_TASK_SOUND_OPTIONS.map(({ value, label }) => {
+                  const isActive = completeTaskSound === value;
+                  const isThisPreviewing = previewingSoundId === value;
+                  const showPause = isThisPreviewing && !isPreviewPaused;
+                  return (
+                    <View key={value} style={styles.themeRow}>
+                      <Pressable
+                        style={({ pressed }) => [
+                          { flex: 1, flexDirection: "row", alignItems: "center", gap: 12 },
+                          pressed && { opacity: 0.7 },
+                        ]}
+                        onPress={() => {
+                          setCompleteTaskSound(value);
+                          startPreview(value);
+                        }}
+                      >
+                        <View
+                          style={[
+                            styles.themeRadio,
+                            {
+                              borderColor: isActive ? colors.brand : colors.border,
+                              backgroundColor: isActive
+                                ? colors.brand
+                                : "transparent",
+                            },
+                          ]}
+                        >
+                          {isActive && <View style={styles.themeRadioInner} />}
+                        </View>
+                        <Text style={styles.themeLabel}>{label}</Text>
+                      </Pressable>
+                      {isActive && (
+                        <Pressable
+                          style={({ pressed }) => [
+                            styles.previewButton,
+                            pressed && { opacity: 0.7 },
+                          ]}
+                          onPress={() => handlePlayPausePreview(value)}
+                        >
+                          <MaterialIcons
+                            name={showPause ? "pause" : "play-arrow"}
+                            size={24}
+                            color={colors.brand}
+                          />
+                        </Pressable>
+                      )}
+                    </View>
+                  );
+                })}
+              </View>
+            </>
+          )}
         </View>
 
         {/* Account & Privacy
