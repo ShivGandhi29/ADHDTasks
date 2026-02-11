@@ -166,6 +166,7 @@ export default function ToDoList() {
                 label="To Do"
                 task={item.name}
                 durationMinutes={item.durationMinutes}
+                createdAt={item.createdAt}
                 onDelete={() => handleDelete(item.id)}
                 onReactivate={() => handleAddToCurrent(item)}
                 reactivateLabel="Add to Up Next"

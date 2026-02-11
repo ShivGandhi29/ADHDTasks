@@ -175,6 +175,7 @@ export default function History() {
                 label="Past Task"
                 task={item.name}
                 durationMinutes={item.durationMinutes}
+                createdAt={item.createdAt}
                 onDelete={() => handleDelete(item.id)}
                 onReactivate={() => handleAddFromHistory(item)}
                 onMoveToToDo={() => handleMoveToToDo(item)}

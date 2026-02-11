@@ -301,6 +301,7 @@ export default function HomeScreen() {
                 key={item.id}
                 task={item.name}
                 durationMinutes={item.durationMinutes}
+                createdAt={item.createdAt}
                 onDelete={() => handleDeleteInactive(item.id)}
                 onActivate={() => handleActivateInactive(item)}
                 onMoveToToDo={() => handleMoveToToDo(item)}

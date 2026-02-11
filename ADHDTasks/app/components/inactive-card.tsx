@@ -2,10 +2,12 @@ import React, { useMemo } from "react";
 import { Pressable, Text, View, StyleSheet } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
 import { useTheme } from "../context/ThemeContext";
+import { formatCreatedAt } from "../utils/formatDate";
 
 type InactiveCardProps = {
   task: string;
   durationMinutes: number;
+  createdAt?: string;
   onDelete: () => void;
   onActivate: () => void;
   onMoveToToDo?: () => void;
@@ -16,6 +18,7 @@ type InactiveCardProps = {
 export default function InactiveCard({
   task,
   durationMinutes,
+  createdAt,
   onDelete,
   onActivate,
   onMoveToToDo,
@@ -49,7 +52,13 @@ export default function InactiveCard({
           color: colors.text,
           marginBottom: 6,
         },
+        metaRow: {
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+        },
         metaText: { fontSize: 14, color: colors.textSecondary },
+        createdText: { fontSize: 13, color: colors.textMuted },
         buttonRow: {
           flexDirection: "row",
           gap: 10,
@@ -98,7 +107,14 @@ export default function InactiveCard({
       <Pressable onPress={onCardPress}>
         <View style={styles.card}>
           <Text style={styles.taskText}>{task}</Text>
-          <Text style={styles.metaText}>{durationMinutes} min</Text>
+          <View style={styles.metaRow}>
+            <Text style={styles.metaText}>{durationMinutes} min</Text>
+            {expanded && createdAt ? (
+              <Text style={styles.createdText}>
+                 {formatCreatedAt(createdAt)}
+              </Text>
+            ) : null}
+          </View>
           {expanded && (
             <View style={styles.buttonRow}>
               <Pressable style={styles.startNowButton} onPress={onActivate}>
