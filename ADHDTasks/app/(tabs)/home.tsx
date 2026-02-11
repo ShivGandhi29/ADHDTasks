@@ -24,14 +24,21 @@ import {
 import { syncWidgetWithTask } from "../utils/widget";
 import { useTheme } from "../context/ThemeContext";
 
+const TAB_BAR_HEIGHT = 56;
+
 export default function HomeScreen() {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const contentBottomPadding = insets.bottom + TAB_BAR_HEIGHT + 24;
   const styles = useMemo(
     () =>
       StyleSheet.create({
         container: { flex: 1, backgroundColor: colors.background },
-        content: { padding: 16, gap: 16 },
+        content: {
+          padding: 16,
+          paddingBottom: contentBottomPadding,
+          gap: 16,
+        },
         list: { gap: 12 },
         upNextHeader: {
           fontSize: 20,
@@ -49,10 +56,8 @@ export default function HomeScreen() {
           fontWeight: "600",
           color: colors.text,
         },
-        contentFullScreen: { padding: 16 },
-        activeFullScreen: {},
       }),
-    [colors],
+    [colors, contentBottomPadding],
   );
   const [inactiveTasks, setInactiveTasks] = useState<TaskItem[]>([]);
   const [isActiveRunning, setIsActiveRunning] = useState(false);
@@ -265,19 +270,14 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
-        contentContainerStyle={[
-          styles.content,
-          isActiveRunning && styles.contentFullScreen,
-        ]}
+        contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        {!isActiveRunning && (
-          <View style={styles.header}>
-            <Text style={styles.greeting}>{greeting}</Text>
-          </View>
-        )}
+        <View style={styles.header}>
+          <Text style={styles.greeting}>{greeting}</Text>
+        </View>
         {activeTask ? (
-          <View style={isActiveRunning ? styles.activeFullScreen : undefined}>
+          <View>
             <ActiveCard
               task={activeTask.task}
               durationMinutes={activeTask.durationMinutes}
@@ -293,7 +293,7 @@ export default function HomeScreen() {
             submitLabel="Add Task"
           />
         )}
-        {!isActiveRunning && inactiveTasks.length > 0 && (
+        {inactiveTasks.length > 0 && (
           <View style={styles.list}>
             <Text style={styles.upNextHeader}>Up next</Text>
             {inactiveTasks.map((item) => (

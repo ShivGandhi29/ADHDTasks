@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Audio } from "expo-av";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useTheme } from "../context/ThemeContext";
 import type { PaletteSetName } from "../constants/theme";
@@ -46,8 +46,12 @@ const PALETTE_OPTIONS: { value: PaletteSetName; label: string }[] = [
   { value: "sunset", label: "Sunset" },
 ];
 
+const TAB_BAR_HEIGHT = 56;
+
 export default function Settings() {
+  const insets = useSafeAreaInsets();
   const { colors, themePreference, setThemePreference, paletteSet, setPaletteSet } = useTheme();
+  const contentBottomPadding = insets.bottom + TAB_BAR_HEIGHT + 24;
   const [alarmEnabled, setAlarmEnabledState] = useState(true);
   const [completeTaskSound, setCompleteTaskSoundState] =
     useState<CompleteTaskSoundId>(DEFAULT_COMPLETE_TASK_SOUND);
@@ -230,6 +234,7 @@ export default function Settings() {
         },
         content: {
           padding: 24,
+          paddingBottom: contentBottomPadding,
           gap: 16,
         },
         sectionTitle: {
@@ -325,7 +330,7 @@ export default function Settings() {
           gap: 4,
         },
       }),
-    [colors],
+    [colors, contentBottomPadding],
   );
 
   const onPlaceholder = () => {
