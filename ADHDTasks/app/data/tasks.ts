@@ -35,26 +35,25 @@ export async function removeTask(taskId: string): Promise<void> {
   await AsyncStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(filtered));
 }
 
+// Deprecated: Use getHistoryTasksByGroup from history-storage.ts instead
+// Kept for backward compatibility - delegates to new date-bucketed storage
 export async function getHistoryTasks(): Promise<TaskItem[]> {
-  const existing = await AsyncStorage.getItem(HISTORY_STORAGE_KEY);
-  if (!existing) return [];
-  try {
-    return JSON.parse(existing) as TaskItem[];
-  } catch {
-    return [];
-  }
+  const { getAllHistoryTasks } = await import("./history-storage");
+  return getAllHistoryTasks();
 }
 
+// Deprecated: Use addHistoryTask from history-storage.ts instead
+// Kept for backward compatibility - delegates to new date-bucketed storage
 export async function addHistoryTask(task: TaskItem): Promise<void> {
-  const tasks = await getHistoryTasks();
-  tasks.push(task);
-  await AsyncStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(tasks));
+  const { addHistoryTask: addHistoryTaskNew } = await import("./history-storage");
+  await addHistoryTaskNew(task);
 }
 
+// Deprecated: Use removeHistoryTask from history-storage.ts instead
+// Kept for backward compatibility - delegates to new date-bucketed storage
 export async function removeHistoryTask(taskId: string): Promise<void> {
-  const tasks = await getHistoryTasks();
-  const filtered = tasks.filter((task) => task.id !== taskId);
-  await AsyncStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(filtered));
+  const { removeHistoryTask: removeHistoryTaskNew } = await import("./history-storage");
+  await removeHistoryTaskNew(taskId);
 }
 
 export async function getActiveTask(): Promise<TaskItem | null> {

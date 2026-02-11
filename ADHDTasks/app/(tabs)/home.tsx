@@ -9,7 +9,6 @@ import ActiveCard from "../components/active-card";
 import InactiveCard from "../components/inactive-card";
 import CreateTaskForm from "../components/create-task-form";
 import {
-  addHistoryTask,
   addTask,
   addToDoListTask,
   clearActiveTask,
@@ -21,6 +20,7 @@ import {
   setActiveTask as setActiveTaskStorage,
   TaskItem,
 } from "../data/tasks";
+import { addHistoryTask } from "../data/history-storage";
 import { syncWidgetWithTask } from "../utils/widget";
 import { useTheme } from "../context/ThemeContext";
 

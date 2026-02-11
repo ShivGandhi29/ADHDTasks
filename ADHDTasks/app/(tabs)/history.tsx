@@ -16,19 +16,22 @@ import {
   addTask,
   addToDoListTask,
   getActiveTask,
-  getHistoryTasks,
   getTasks,
-  removeHistoryTask,
   setActiveTask,
   TaskItem,
 } from "../data/tasks";
+import {
+  getHistoryTasksByGroup,
+  removeHistoryTask,
+  migrateHistoryToBuckets,
+} from "../data/history-storage";
 import { useTheme } from "../context/ThemeContext";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { getDateGroup, DATE_GROUP_HEADERS, type DateGroup } from "../utils/formatDate";
 
 const MAX_TASKS = 3;
 const SECTION_PAGE_SIZE = 5;
-const TAB_BAR_HEIGHT = 0;
+const TAB_BAR_HEIGHT = 56;
 
 export default function History() {
   const router = useRouter();
@@ -51,16 +54,21 @@ export default function History() {
           paddingVertical: 48,
         },
         list: { gap: 12 },
+        sectionHeaderRow: {
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginTop: 20,
+          marginBottom: 8,
+        },
+        sectionHeaderRowFirst: { marginTop: 0 },
         sectionHeader: {
           fontSize: 13,
           fontWeight: "600",
           color: colors.textMuted,
           textTransform: "uppercase",
           letterSpacing: 0.6,
-          marginTop: 20,
-          marginBottom: 8,
         },
-        sectionHeaderFirst: { marginTop: 0 },
         sectionBlock: { gap: 12 },
         showMoreRow: {
           flexDirection: "row",
@@ -88,15 +96,50 @@ export default function History() {
   );
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   const [weekVisibleCount, setWeekVisibleCount] = useState(SECTION_PAGE_SIZE);
+  const [yearVisibleCount, setYearVisibleCount] = useState(SECTION_PAGE_SIZE);
   const [olderVisibleCount, setOlderVisibleCount] = useState(SECTION_PAGE_SIZE);
+  const [collapsedSections, setCollapsedSections] = useState<{
+    today: boolean;
+    week: boolean;
+    year: boolean;
+    older: boolean;
+  }>({ today: false, week: true, year: true, older: true });
+  const [groupedTasks, setGroupedTasks] = useState<{
+    today: TaskItem[];
+    week: TaskItem[];
+    year: TaskItem[];
+    older: TaskItem[];
+  }>({ today: [], week: [], year: [], older: [] });
+
+  // Migrate old history on mount
+  useFocusEffect(
+    useCallback(() => {
+      migrateHistoryToBuckets();
+    }, []),
+  );
 
   const loadTasks = useCallback(async () => {
-    const existing = await getHistoryTasks();
-    const sorted = [...existing].sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    );
-    setTasks(sorted);
+    // Load each group separately for performance
+    const [today, week, year, older] = await Promise.all([
+      getHistoryTasksByGroup("today"),
+      getHistoryTasksByGroup("week"),
+      getHistoryTasksByGroup("year"),
+      getHistoryTasksByGroup("older"),
+    ]);
+
+    // Sort each group (newest first)
+    const sortByDate = (a: TaskItem, b: TaskItem) =>
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+
+    setGroupedTasks({
+      today: today.sort(sortByDate),
+      week: week.sort(sortByDate),
+      year: year.sort(sortByDate),
+      older: older.sort(sortByDate),
+    });
+
+    // Set all tasks for empty state check
+    setTasks([...today, ...week, ...year, ...older]);
   }, []);
 
   useFocusEffect(
@@ -169,23 +212,11 @@ export default function History() {
     setExpandedTaskId(null);
   }, []);
 
-  const grouped = useMemo(() => {
-    const today: TaskItem[] = [];
-    const week: TaskItem[] = [];
-    const older: TaskItem[] = [];
-    for (const item of tasks) {
-      const g = getDateGroup(item.createdAt);
-      if (g === "today") today.push(item);
-      else if (g === "week") week.push(item);
-      else older.push(item);
-    }
-    return { today, week, older };
-  }, [tasks]);
-
   const sections: { key: DateGroup; items: TaskItem[] }[] = [
-    { key: "today", items: grouped.today },
-    { key: "week", items: grouped.week },
-    { key: "older", items: grouped.older },
+    { key: "today", items: groupedTasks.today },
+    { key: "week", items: groupedTasks.week },
+    { key: "year", items: groupedTasks.year },
+    { key: "older", items: groupedTasks.older },
   ];
 
   return (
@@ -229,22 +260,41 @@ export default function History() {
               const visibleCount =
                 key === "week"
                   ? weekVisibleCount
-                  : key === "older"
-                    ? olderVisibleCount
-                    : items.length;
+                  : key === "year"
+                    ? yearVisibleCount
+                    : key === "older"
+                      ? olderVisibleCount
+                      : items.length;
               const visibleItems = items.slice(0, visibleCount);
               const hasMore = items.length > visibleCount;
+              const isCollapsed = collapsedSections[key];
               return (
                 <View key={key} style={styles.sectionBlock}>
-                  <Text
-                    style={[
-                      styles.sectionHeader,
-                      sectionIndex === 0 && styles.sectionHeaderFirst,
+                  <Pressable
+                    style={({ pressed }) => [
+                      styles.sectionHeaderRow,
+                      sectionIndex === 0 && styles.sectionHeaderRowFirst,
+                      pressed && { opacity: 0.7 },
                     ]}
+                    onPress={() =>
+                      setCollapsedSections((prev) => ({
+                        ...prev,
+                        [key]: !prev[key],
+                      }))
+                    }
                   >
-                    {DATE_GROUP_HEADERS[key]}
-                  </Text>
-                  {visibleItems.map((item) => (
+                    <Text style={styles.sectionHeader}>
+                      {DATE_GROUP_HEADERS[key]}
+                    </Text>
+                    <MaterialIcons
+                      name={isCollapsed ? "expand-more" : "expand-less"}
+                      size={20}
+                      color={colors.textMuted}
+                    />
+                  </Pressable>
+                  {!isCollapsed && (
+                    <>
+                      {visibleItems.map((item) => (
                     <PastCard
                       key={item.id}
                       label="Past Task"
@@ -265,11 +315,15 @@ export default function History() {
                         styles.showMoreRow,
                         pressed && { opacity: 0.7 },
                       ]}
-                      onPress={() =>
-                        key === "week"
-                          ? setWeekVisibleCount((c) => c + SECTION_PAGE_SIZE)
-                          : setOlderVisibleCount((c) => c + SECTION_PAGE_SIZE)
-                      }
+                      onPress={() => {
+                        if (key === "week") {
+                          setWeekVisibleCount((c) => c + SECTION_PAGE_SIZE);
+                        } else if (key === "year") {
+                          setYearVisibleCount((c) => c + SECTION_PAGE_SIZE);
+                        } else if (key === "older") {
+                          setOlderVisibleCount((c) => c + SECTION_PAGE_SIZE);
+                        }
+                      }}
                     >
                       <Text style={styles.showMoreText}>Show more</Text>
                       <MaterialIcons
@@ -278,6 +332,8 @@ export default function History() {
                         color={colors.brand}
                       />
                     </Pressable>
+                  )}
+                    </>
                   )}
                 </View>
               );

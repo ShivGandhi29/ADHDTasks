@@ -1,8 +1,8 @@
-export type DateGroup = "today" | "week" | "older";
+export type DateGroup = "today" | "week" | "year" | "older";
 
 /**
- * Return which section a createdAt ISO string belongs to: Today, The Week, or Older.
- * Today = same calendar day; Week = within last 7 days excluding today; Older = 7+ days ago.
+ * Return which section a createdAt ISO string belongs to: Today, This Week, This Year, or Older.
+ * Today = same calendar day; Week = within last 7 days excluding today; Year = this year but older than a week; Older = previous years.
  */
 export function getDateGroup(createdAt: string): DateGroup {
   const date = new Date(createdAt);
@@ -12,17 +12,20 @@ export function getDateGroup(createdAt: string): DateGroup {
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const weekStart = new Date(todayStart);
   weekStart.setDate(weekStart.getDate() - 6); // 7 days ago start of day
+  const yearStart = new Date(now.getFullYear(), 0, 1); // January 1st of this year
 
   const inputDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
   if (inputDay.getTime() === todayStart.getTime()) return "today";
   if (inputDay.getTime() < todayStart.getTime() && date.getTime() >= weekStart.getTime())
     return "week";
+  if (date.getTime() >= yearStart.getTime()) return "year";
   return "older";
 }
 
 export const DATE_GROUP_HEADERS: Record<DateGroup, string> = {
   today: "Today",
-  week: "The Week",
+  week: "This week",
+  year: "This year",
   older: "Older",
 };
 

@@ -50,16 +50,21 @@ export default function ToDoList() {
           paddingVertical: 48,
         },
         list: { gap: 12 },
+        sectionHeaderRow: {
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginTop: 20,
+          marginBottom: 8,
+        },
+        sectionHeaderRowFirst: { marginTop: 0 },
         sectionHeader: {
           fontSize: 13,
           fontWeight: "600",
           color: colors.textMuted,
           textTransform: "uppercase",
           letterSpacing: 0.6,
-          marginTop: 20,
-          marginBottom: 8,
         },
-        sectionHeaderFirst: { marginTop: 0 },
         sectionBlock: { gap: 12 },
         ctaPressable: { alignItems: "center", paddingVertical: 4 },
         ctaPressablePressed: { opacity: 0.85 },
@@ -89,7 +94,14 @@ export default function ToDoList() {
   );
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   const [weekVisibleCount, setWeekVisibleCount] = useState(SECTION_PAGE_SIZE);
+  const [yearVisibleCount, setYearVisibleCount] = useState(SECTION_PAGE_SIZE);
   const [olderVisibleCount, setOlderVisibleCount] = useState(SECTION_PAGE_SIZE);
+  const [collapsedSections, setCollapsedSections] = useState<{
+    today: boolean;
+    week: boolean;
+    year: boolean;
+    older: boolean;
+  }>({ today: false, week: true, year: true, older: true });
 
   const loadTasks = useCallback(async () => {
     const existing = await getToDoListTasks();
@@ -163,19 +175,22 @@ export default function ToDoList() {
   const grouped = useMemo(() => {
     const today: TaskItem[] = [];
     const week: TaskItem[] = [];
+    const year: TaskItem[] = [];
     const older: TaskItem[] = [];
     for (const item of tasks) {
       const g = getDateGroup(item.createdAt);
       if (g === "today") today.push(item);
       else if (g === "week") week.push(item);
+      else if (g === "year") year.push(item);
       else older.push(item);
     }
-    return { today, week, older };
+    return { today, week, year, older };
   }, [tasks]);
 
   const sections: { key: DateGroup; items: TaskItem[] }[] = [
     { key: "today", items: grouped.today },
     { key: "week", items: grouped.week },
+    { key: "year", items: grouped.year },
     { key: "older", items: grouped.older },
   ];
 
@@ -220,22 +235,41 @@ export default function ToDoList() {
               const visibleCount =
                 key === "week"
                   ? weekVisibleCount
-                  : key === "older"
-                    ? olderVisibleCount
-                    : items.length;
+                  : key === "year"
+                    ? yearVisibleCount
+                    : key === "older"
+                      ? olderVisibleCount
+                      : items.length;
               const visibleItems = items.slice(0, visibleCount);
               const hasMore = items.length > visibleCount;
+              const isCollapsed = collapsedSections[key];
               return (
                 <View key={key} style={styles.sectionBlock}>
-                  <Text
-                    style={[
-                      styles.sectionHeader,
-                      sectionIndex === 0 && styles.sectionHeaderFirst,
+                  <Pressable
+                    style={({ pressed }) => [
+                      styles.sectionHeaderRow,
+                      sectionIndex === 0 && styles.sectionHeaderRowFirst,
+                      pressed && { opacity: 0.7 },
                     ]}
+                    onPress={() =>
+                      setCollapsedSections((prev) => ({
+                        ...prev,
+                        [key]: !prev[key],
+                      }))
+                    }
                   >
-                    {DATE_GROUP_HEADERS[key]}
-                  </Text>
-                  {visibleItems.map((item) => (
+                    <Text style={styles.sectionHeader}>
+                      {DATE_GROUP_HEADERS[key]}
+                    </Text>
+                    <MaterialIcons
+                      name={isCollapsed ? "expand-more" : "expand-less"}
+                      size={20}
+                      color={colors.textMuted}
+                    />
+                  </Pressable>
+                  {!isCollapsed && (
+                    <>
+                      {visibleItems.map((item) => (
                     <PastCard
                       key={item.id}
                       label="To Do"
@@ -255,11 +289,15 @@ export default function ToDoList() {
                         styles.showMoreRow,
                         pressed && { opacity: 0.7 },
                       ]}
-                      onPress={() =>
-                        key === "week"
-                          ? setWeekVisibleCount((c) => c + SECTION_PAGE_SIZE)
-                          : setOlderVisibleCount((c) => c + SECTION_PAGE_SIZE)
-                      }
+                      onPress={() => {
+                        if (key === "week") {
+                          setWeekVisibleCount((c) => c + SECTION_PAGE_SIZE);
+                        } else if (key === "year") {
+                          setYearVisibleCount((c) => c + SECTION_PAGE_SIZE);
+                        } else if (key === "older") {
+                          setOlderVisibleCount((c) => c + SECTION_PAGE_SIZE);
+                        }
+                      }}
                     >
                       <Text style={styles.showMoreText}>Show more</Text>
                       <MaterialIcons
@@ -268,6 +306,8 @@ export default function ToDoList() {
                         color={colors.brand}
                       />
                     </Pressable>
+                  )}
+                    </>
                   )}
                 </View>
               );
