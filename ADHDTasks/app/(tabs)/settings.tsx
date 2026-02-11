@@ -10,6 +10,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useTheme } from "../context/ThemeContext";
+import type { PaletteSetName } from "../constants/theme";
 
 type ThemeOption = "light" | "dark" | "system";
 
@@ -19,8 +20,20 @@ const THEME_OPTIONS: { value: ThemeOption; label: string }[] = [
   { value: "system", label: "System" },
 ];
 
+const PALETTE_OPTIONS: { value: PaletteSetName; label: string }[] = [
+  { value: "default", label: "Default" },
+  { value: "forest", label: "Forest" },
+  { value: "ocean", label: "Ocean" },
+  { value: "warm", label: "Warm" },
+  { value: "highContrast", label: "High contrast" },
+  { value: "midnight", label: "Midnight" },
+  { value: "rose", label: "Rose" },
+  { value: "slate", label: "Slate" },
+  { value: "sunset", label: "Sunset" },
+];
+
 export default function Settings() {
-  const { colors, themePreference, setThemePreference } = useTheme();
+  const { colors, themePreference, setThemePreference, paletteSet, setPaletteSet } = useTheme();
 
   function SettingsRow({
     icon,
@@ -196,12 +209,8 @@ export default function Settings() {
               pressed && { opacity: 0.7 },
             ]}
           >
-            <MaterialIcons
-              name="palette"
-              size={22}
-              color={colors.textSecondary}
-            />
-            <Text style={[styles.rowLabel, { color: colors.text }]}>Theme</Text>
+
+            <Text style={[styles.rowLabel, { color: colors.text }]}></Text>
             <Text style={[styles.themeLabel, { color: colors.textMuted }]}>
               {themePreference === "system"
                 ? "System"
@@ -209,7 +218,6 @@ export default function Settings() {
                   ? "Light"
                   : "Dark"}
             </Text>
-
           </Pressable>
           <View style={styles.themeOptions}>
             {THEME_OPTIONS.map(({ value, label }) => {
@@ -219,6 +227,55 @@ export default function Settings() {
                   key={value}
                   style={styles.themeRow}
                   onPress={() => setThemePreference(value)}
+                >
+                  <View
+                    style={[
+                      styles.themeRadio,
+                      {
+                        borderColor: isActive ? colors.brand : colors.border,
+                        backgroundColor: isActive
+                          ? colors.brand
+                          : "transparent",
+                      },
+                    ]}
+                  >
+                    {isActive && <View style={styles.themeRadioInner} />}
+                  </View>
+                  <Text style={styles.themeLabel}>{label}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
+        <Text style={styles.sectionTitle}>Colour Palette</Text>
+
+        <View style={styles.card}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.row,
+              {
+                borderBottomWidth: StyleSheet.hairlineWidth,
+                borderBottomColor: colors.border,
+              },
+              pressed && { opacity: 0.7 },
+            ]}
+          >
+    
+            <Text style={[styles.rowLabel, { color: colors.text }]}>
+            </Text>
+            <Text style={[styles.themeLabel, { color: colors.textMuted }]}>
+              {PALETTE_OPTIONS.find((o) => o.value === paletteSet)?.label ??
+                "Default"}
+            </Text>
+          </Pressable>
+          <View style={styles.themeOptions}>
+            {PALETTE_OPTIONS.map(({ value, label }) => {
+              const isActive = paletteSet === value;
+              return (
+                <Pressable
+                  key={value}
+                  style={styles.themeRow}
+                  onPress={() => setPaletteSet(value)}
                 >
                   <View
                     style={[
