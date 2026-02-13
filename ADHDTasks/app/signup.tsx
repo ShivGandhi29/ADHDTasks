@@ -7,12 +7,12 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  Linking,
   Image,
   Keyboard,
   TouchableOpacity,
   Pressable,
 } from "react-native";
+import * as WebBrowser from "expo-web-browser";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -32,8 +32,7 @@ export default function SignupScreen() {
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [eulaAccepted, setEulaAccepted] = useState(false);
 
-  const canContinue =
-    name.trim().length > 0 && privacyAccepted && eulaAccepted;
+  const canContinue = name.trim().length > 0 && privacyAccepted && eulaAccepted;
 
   const handleContinue = useCallback(async () => {
     if (!canContinue) return;
@@ -220,7 +219,12 @@ export default function SignupScreen() {
               onPress={() => setPrivacyAccepted((v) => !v)}
               activeOpacity={0.7}
             >
-              <View style={[styles.checkbox, privacyAccepted && styles.checkboxChecked]}>
+              <View
+                style={[
+                  styles.checkbox,
+                  privacyAccepted && styles.checkboxChecked,
+                ]}
+              >
                 {privacyAccepted && (
                   <MaterialIcons name="check" size={16} color={colors.white} />
                 )}
@@ -231,7 +235,9 @@ export default function SignupScreen() {
                   style={styles.link}
                   onPress={(e) => {
                     e.stopPropagation();
-                    Linking.openURL("https://example.com/privacy");
+                    WebBrowser.openBrowserAsync(
+                      "https://shivgandhi29.github.io/focusd.github.io/privacy.html",
+                    );
                   }}
                 >
                   Privacy Policy
@@ -244,7 +250,12 @@ export default function SignupScreen() {
               onPress={() => setEulaAccepted((v) => !v)}
               activeOpacity={0.7}
             >
-              <View style={[styles.checkbox, eulaAccepted && styles.checkboxChecked]}>
+              <View
+                style={[
+                  styles.checkbox,
+                  eulaAccepted && styles.checkboxChecked,
+                ]}
+              >
                 {eulaAccepted && (
                   <MaterialIcons name="check" size={16} color={colors.white} />
                 )}
@@ -255,7 +266,9 @@ export default function SignupScreen() {
                   style={styles.link}
                   onPress={(e) => {
                     e.stopPropagation();
-                    Linking.openURL("https://example.com/eula");
+                    WebBrowser.openBrowserAsync(
+                      "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/",
+                    );
                   }}
                 >
                   EULA

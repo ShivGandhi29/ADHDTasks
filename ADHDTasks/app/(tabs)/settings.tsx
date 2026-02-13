@@ -8,14 +8,17 @@ import {
   Alert,
   Switch,
   TextInput,
-  Linking,
   Modal,
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
+import * as WebBrowser from "expo-web-browser";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Audio } from "expo-av";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useTheme } from "../context/ThemeContext";
 import type { PaletteSetName } from "../constants/theme";
@@ -32,8 +35,10 @@ const ALARM_ENABLED_KEY = "@adhdtasks/alarm_enabled";
 const COMPLETE_TASK_SOUND_KEY = "@adhdtasks/complete_task_sound";
 const USER_NAME_KEY = "@adhdtasks/user_name";
 
-const PRIVACY_POLICY_URL = "https://example.com/privacy";
-const EULA_URL = "https://example.com/eula";
+const PRIVACY_POLICY_URL =
+  "https://shivgandhi29.github.io/focusd.github.io/privacy.html";
+const EULA_URL =
+  "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/";
 
 type ThemeOption = "light" | "dark" | "system";
 
@@ -59,7 +64,13 @@ const TAB_BAR_HEIGHT = 56;
 
 export default function Settings() {
   const insets = useSafeAreaInsets();
-  const { colors, themePreference, setThemePreference, paletteSet, setPaletteSet } = useTheme();
+  const {
+    colors,
+    themePreference,
+    setThemePreference,
+    paletteSet,
+    setPaletteSet,
+  } = useTheme();
   const contentBottomPadding = insets.bottom + TAB_BAR_HEIGHT + 24;
   const [alarmEnabled, setAlarmEnabledState] = useState(true);
   const [completeTaskSound, setCompleteTaskSoundState] =
@@ -92,37 +103,40 @@ export default function Settings() {
     setIsPreviewPaused(false);
   }, []);
 
-  const startPreview = useCallback(async (id: CompleteTaskSoundId) => {
-    await stopPreview();
-    const source = COMPLETE_TASK_SOUND_SOURCES[id];
-    if (source == null) return;
-    try {
-      await Audio.setAudioModeAsync({
-        playsInSilentModeIOS: true,
-        staysActiveInBackground: false,
-        shouldDuckAndroid: true,
-        playThroughEarpieceAndroid: false,
-      });
-      const { sound } = await Audio.Sound.createAsync(
-        source as Parameters<typeof Audio.Sound.createAsync>[0],
-      );
-      soundRef.current = sound;
-      setPreviewingSoundId(id);
-      setIsPreviewPaused(false);
-      await sound.playAsync();
-      sound.setOnPlaybackStatusUpdate((status) => {
-        if (status.isLoaded && status.didJustFinish) {
+  const startPreview = useCallback(
+    async (id: CompleteTaskSoundId) => {
+      await stopPreview();
+      const source = COMPLETE_TASK_SOUND_SOURCES[id];
+      if (source == null) return;
+      try {
+        await Audio.setAudioModeAsync({
+          playsInSilentModeIOS: true,
+          staysActiveInBackground: false,
+          shouldDuckAndroid: true,
+          playThroughEarpieceAndroid: false,
+        });
+        const { sound } = await Audio.Sound.createAsync(
+          source as Parameters<typeof Audio.Sound.createAsync>[0],
+        );
+        soundRef.current = sound;
+        setPreviewingSoundId(id);
+        setIsPreviewPaused(false);
+        await sound.playAsync();
+        sound.setOnPlaybackStatusUpdate((status) => {
+          if (status.isLoaded && status.didJustFinish) {
+            stopPreview();
+          }
+        });
+        previewTimerRef.current = setTimeout(() => {
+          previewTimerRef.current = null;
           stopPreview();
-        }
-      });
-      previewTimerRef.current = setTimeout(() => {
-        previewTimerRef.current = null;
-        stopPreview();
-      }, PREVIEW_DURATION_MS);
-    } catch {
-      setPreviewingSoundId(null);
-    }
-  }, [stopPreview]);
+        }, PREVIEW_DURATION_MS);
+      } catch {
+        setPreviewingSoundId(null);
+      }
+    },
+    [stopPreview],
+  );
 
   const handlePlayPausePreview = useCallback(
     async (id: CompleteTaskSoundId) => {
@@ -152,7 +166,8 @@ export default function Settings() {
 
   useEffect(() => {
     return () => {
-      if (previewTimerRef.current != null) clearTimeout(previewTimerRef.current);
+      if (previewTimerRef.current != null)
+        clearTimeout(previewTimerRef.current);
       soundRef.current?.unloadAsync().catch(() => {});
     };
   }, []);
@@ -180,14 +195,17 @@ export default function Settings() {
     })();
   }, []);
 
-  const setCompleteTaskSound = useCallback(async (value: CompleteTaskSoundId) => {
-    setCompleteTaskSoundState(value);
-    try {
-      await AsyncStorage.setItem(COMPLETE_TASK_SOUND_KEY, value);
-    } catch {
-      // ignore
-    }
-  }, []);
+  const setCompleteTaskSound = useCallback(
+    async (value: CompleteTaskSoundId) => {
+      setCompleteTaskSoundState(value);
+      try {
+        await AsyncStorage.setItem(COMPLETE_TASK_SOUND_KEY, value);
+      } catch {
+        // ignore
+      }
+    },
+    [],
+  );
 
   const setAlarmEnabled = useCallback(async (value: boolean) => {
     setAlarmEnabledState(value);
@@ -283,7 +301,6 @@ export default function Settings() {
         card: {
           backgroundColor: colors.cardMuted,
           borderRadius: 12,
-          
         },
         row: {
           flexDirection: "row",
@@ -441,7 +458,6 @@ export default function Settings() {
               pressed && { opacity: 0.7 },
             ]}
           >
-
             <Text style={[styles.rowLabel, { color: colors.text }]}></Text>
             <Text style={[styles.themeLabel, { color: colors.textMuted }]}>
               {themePreference === "system"
@@ -492,9 +508,7 @@ export default function Settings() {
               pressed && { opacity: 0.7 },
             ]}
           >
-    
-            <Text style={[styles.rowLabel, { color: colors.text }]}>
-            </Text>
+            <Text style={[styles.rowLabel, { color: colors.text }]}></Text>
             <Text style={[styles.themeLabel, { color: colors.textMuted }]}>
               {PALETTE_OPTIONS.find((o) => o.value === paletteSet)?.label ??
                 "Default"}
@@ -541,7 +555,11 @@ export default function Settings() {
               },
             ]}
           >
-            <MaterialIcons name="alarm" size={22} color={colors.textSecondary} />
+            <MaterialIcons
+              name="alarm"
+              size={22}
+              color={colors.textSecondary}
+            />
             <Text style={[styles.rowLabel, { color: colors.text }]}>Alarm</Text>
             <Switch
               value={alarmEnabled}
@@ -552,7 +570,6 @@ export default function Settings() {
           </View>
           {alarmEnabled && (
             <>
-
               <View style={styles.themeOptions}>
                 {COMPLETE_TASK_SOUND_OPTIONS.map(({ value, label }) => {
                   const isActive = completeTaskSound === value;
@@ -562,7 +579,12 @@ export default function Settings() {
                     <View key={value} style={styles.themeRow}>
                       <Pressable
                         style={({ pressed }) => [
-                          { flex: 1, flexDirection: "row", alignItems: "center", gap: 12 },
+                          {
+                            flex: 1,
+                            flexDirection: "row",
+                            alignItems: "center",
+                            gap: 12,
+                          },
                           pressed && { opacity: 0.7 },
                         ]}
                         onPress={() => {
@@ -574,7 +596,9 @@ export default function Settings() {
                           style={[
                             styles.themeRadio,
                             {
-                              borderColor: isActive ? colors.brand : colors.border,
+                              borderColor: isActive
+                                ? colors.brand
+                                : colors.border,
                               backgroundColor: isActive
                                 ? colors.brand
                                 : "transparent",
@@ -616,10 +640,17 @@ export default function Settings() {
             label="Name"
             right={
               <>
-                <Text style={[styles.themeLabel, { color: colors.textMuted }]} numberOfLines={1}>
+                <Text
+                  style={[styles.themeLabel, { color: colors.textMuted }]}
+                  numberOfLines={1}
+                >
                   {userName || "Not set"}
                 </Text>
-                <MaterialIcons name="chevron-right" size={22} color={colors.textMuted} />
+                <MaterialIcons
+                  name="chevron-right"
+                  size={22}
+                  color={colors.textMuted}
+                />
               </>
             }
             onPress={openNameModal}
@@ -628,13 +659,13 @@ export default function Settings() {
           <SettingsRow
             icon="policy"
             label="Privacy Policy"
-            onPress={() => Linking.openURL(PRIVACY_POLICY_URL)}
+            onPress={() => WebBrowser.openBrowserAsync(PRIVACY_POLICY_URL)}
             isLast={false}
           />
           <SettingsRow
             icon="description"
             label="EULA"
-            onPress={() => Linking.openURL(EULA_URL)}
+            onPress={() => WebBrowser.openBrowserAsync(EULA_URL)}
             isLast
           />
         </View>
@@ -719,12 +750,18 @@ export default function Settings() {
         animationType="fade"
         onRequestClose={() => setShowNameModal(false)}
       >
-        <Pressable style={styles.modalOverlay} onPress={() => setShowNameModal(false)}>
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setShowNameModal(false)}
+        >
           <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : undefined}
             style={{ alignSelf: "stretch" }}
           >
-            <Pressable style={styles.modalCard} onPress={(e) => e.stopPropagation()}>
+            <Pressable
+              style={styles.modalCard}
+              onPress={(e) => e.stopPropagation()}
+            >
               <Text style={styles.modalTitle}>Change name</Text>
               <TextInput
                 style={styles.modalInput}
@@ -738,7 +775,10 @@ export default function Settings() {
               />
               <View style={styles.modalButtons}>
                 <Pressable
-                  style={({ pressed }) => [styles.modalButton, pressed && { opacity: 0.7 }]}
+                  style={({ pressed }) => [
+                    styles.modalButton,
+                    pressed && { opacity: 0.7 },
+                  ]}
                   onPress={() => setShowNameModal(false)}
                 >
                   <Text style={styles.modalButtonText}>Cancel</Text>
@@ -748,14 +788,23 @@ export default function Settings() {
                     styles.modalButton,
                     styles.modalButtonPrimary,
                     pressed && { opacity: 0.9 },
-                    (nameDraft.trim().length === 0 || nameDraft.trim().length > 14) && {
+                    (nameDraft.trim().length === 0 ||
+                      nameDraft.trim().length > 14) && {
                       opacity: 0.5,
                     },
                   ]}
                   onPress={saveName}
-                  disabled={nameDraft.trim().length === 0 || nameDraft.trim().length > 14}
+                  disabled={
+                    nameDraft.trim().length === 0 ||
+                    nameDraft.trim().length > 14
+                  }
                 >
-                  <Text style={[styles.modalButtonText, styles.modalButtonTextPrimary]}>
+                  <Text
+                    style={[
+                      styles.modalButtonText,
+                      styles.modalButtonTextPrimary,
+                    ]}
+                  >
                     Save
                   </Text>
                 </Pressable>
