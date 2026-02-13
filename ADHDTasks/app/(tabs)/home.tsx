@@ -85,16 +85,18 @@ export default function HomeScreen() {
   );
   const [userName, setUserName] = useState<string | null>(null);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const name = await AsyncStorage.getItem(USER_NAME_KEY);
-        if (name?.trim()) setUserName(name.trim());
-      } catch {
-        // ignore
-      }
-    })();
+  const loadUserName = useCallback(async () => {
+    try {
+      const name = await AsyncStorage.getItem(USER_NAME_KEY);
+      setUserName(name?.trim() ?? null);
+    } catch {
+      // ignore
+    }
   }, []);
+
+  useEffect(() => {
+    loadUserName();
+  }, [loadUserName]);
 
   const handleInactiveCardPress = useCallback((itemId: string) => {
     setExpandedInactiveId((current) => (current === itemId ? null : itemId));
@@ -152,7 +154,8 @@ export default function HomeScreen() {
   useFocusEffect(
     useCallback(() => {
       loadTasks();
-    }, [loadTasks]),
+      loadUserName();
+    }, [loadTasks, loadUserName]),
   );
 
   const handleDeleteInactive = (taskId: string) => {
@@ -312,9 +315,9 @@ export default function HomeScreen() {
       >
         <View style={styles.header}>
           <Text style={styles.greeting}>{greeting}</Text>
-          <Pressable style={styles.testSignupButton} onPress={handleTestSignup}>
+          {/* <Pressable style={styles.testSignupButton} onPress={handleTestSignup}>
             <Text style={styles.testSignupButtonText}>Test signup screen</Text>
-          </Pressable>
+          </Pressable> */}
         </View>
         {activeTask ? (
           <View>

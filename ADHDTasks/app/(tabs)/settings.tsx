@@ -7,6 +7,11 @@ import {
   ScrollView,
   Alert,
   Switch,
+  TextInput,
+  Linking,
+  Modal,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Audio } from "expo-av";
@@ -25,6 +30,10 @@ const PREVIEW_DURATION_MS = 10_000;
 
 const ALARM_ENABLED_KEY = "@adhdtasks/alarm_enabled";
 const COMPLETE_TASK_SOUND_KEY = "@adhdtasks/complete_task_sound";
+const USER_NAME_KEY = "@adhdtasks/user_name";
+
+const PRIVACY_POLICY_URL = "https://example.com/privacy";
+const EULA_URL = "https://example.com/eula";
 
 type ThemeOption = "light" | "dark" | "system";
 
@@ -58,6 +67,9 @@ export default function Settings() {
   const [previewingSoundId, setPreviewingSoundId] =
     useState<CompleteTaskSoundId | null>(null);
   const [isPreviewPaused, setIsPreviewPaused] = useState(false);
+  const [userName, setUserName] = useState<string | null>(null);
+  const [showNameModal, setShowNameModal] = useState(false);
+  const [nameDraft, setNameDraft] = useState("");
   const soundRef = useRef<Audio.Sound | null>(null);
   const previewTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -148,9 +160,10 @@ export default function Settings() {
   useEffect(() => {
     (async () => {
       try {
-        const [storedAlarm, storedSound] = await Promise.all([
+        const [storedAlarm, storedSound, storedName] = await Promise.all([
           AsyncStorage.getItem(ALARM_ENABLED_KEY),
           AsyncStorage.getItem(COMPLETE_TASK_SOUND_KEY),
+          AsyncStorage.getItem(USER_NAME_KEY),
         ]);
         if (storedAlarm === "false") setAlarmEnabledState(false);
         else if (storedAlarm === "true") setAlarmEnabledState(true);
@@ -160,6 +173,7 @@ export default function Settings() {
         ) {
           setCompleteTaskSoundState(storedSound as CompleteTaskSoundId);
         }
+        if (storedName?.trim()) setUserName(storedName.trim());
       } catch {
         // keep default
       }
@@ -183,6 +197,23 @@ export default function Settings() {
       // ignore
     }
   }, []);
+
+  const openNameModal = useCallback(() => {
+    setNameDraft(userName ?? "");
+    setShowNameModal(true);
+  }, [userName]);
+
+  const saveName = useCallback(async () => {
+    const trimmed = nameDraft.trim();
+    if (trimmed.length === 0 || trimmed.length > 14) return;
+    setUserName(trimmed);
+    setShowNameModal(false);
+    try {
+      await AsyncStorage.setItem(USER_NAME_KEY, trimmed);
+    } catch {
+      // ignore
+    }
+  }, [nameDraft]);
 
   function SettingsRow({
     icon,
@@ -328,6 +359,58 @@ export default function Settings() {
           flexDirection: "row",
           alignItems: "center",
           gap: 4,
+        },
+        modalOverlay: {
+          flex: 1,
+          backgroundColor: "rgba(0,0,0,0.5)",
+          justifyContent: "center",
+          padding: 24,
+        },
+        modalCard: {
+          backgroundColor: colors.card,
+          borderRadius: 16,
+          padding: 24,
+          maxWidth: 400,
+          width: "100%",
+          alignSelf: "center",
+        },
+        modalTitle: {
+          fontSize: 18,
+          fontWeight: "600",
+          color: colors.text,
+          marginBottom: 16,
+        },
+        modalInput: {
+          backgroundColor: colors.inputBg,
+          borderWidth: 1,
+          borderColor: colors.border,
+          borderRadius: 12,
+          paddingHorizontal: 16,
+          paddingVertical: 12,
+          fontSize: 17,
+          color: colors.text,
+          marginBottom: 20,
+        },
+        modalButtons: {
+          flexDirection: "row",
+          gap: 12,
+          justifyContent: "flex-end",
+        },
+        modalButton: {
+          paddingVertical: 10,
+          paddingHorizontal: 20,
+          borderRadius: 10,
+        },
+        modalButtonPrimary: {
+          backgroundColor: colors.brand,
+        },
+        modalButtonText: {
+          fontSize: 16,
+          fontWeight: "600",
+          color: colors.text,
+        },
+        modalButtonTextPrimary: {
+          color: colors.white,
         },
       }),
     [colors, contentBottomPadding],
@@ -525,6 +608,37 @@ export default function Settings() {
           )}
         </View>
 
+        {/* Account */}
+        <Text style={styles.sectionTitle}>Account</Text>
+        <View style={styles.card}>
+          <SettingsRow
+            icon="person"
+            label="Name"
+            right={
+              <>
+                <Text style={[styles.themeLabel, { color: colors.textMuted }]} numberOfLines={1}>
+                  {userName || "Not set"}
+                </Text>
+                <MaterialIcons name="chevron-right" size={22} color={colors.textMuted} />
+              </>
+            }
+            onPress={openNameModal}
+            isLast={false}
+          />
+          <SettingsRow
+            icon="policy"
+            label="Privacy Policy"
+            onPress={() => Linking.openURL(PRIVACY_POLICY_URL)}
+            isLast={false}
+          />
+          <SettingsRow
+            icon="description"
+            label="EULA"
+            onPress={() => Linking.openURL(EULA_URL)}
+            isLast
+          />
+        </View>
+
         {/* Account & Privacy
         <Text style={styles.sectionTitle}>Account & Privacy</Text>
         <View style={styles.card}>
@@ -598,6 +712,58 @@ export default function Settings() {
           />
         </View> */}
       </ScrollView>
+
+      <Modal
+        visible={showNameModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowNameModal(false)}
+      >
+        <Pressable style={styles.modalOverlay} onPress={() => setShowNameModal(false)}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
+            style={{ alignSelf: "stretch" }}
+          >
+            <Pressable style={styles.modalCard} onPress={(e) => e.stopPropagation()}>
+              <Text style={styles.modalTitle}>Change name</Text>
+              <TextInput
+                style={styles.modalInput}
+                value={nameDraft}
+                onChangeText={setNameDraft}
+                placeholder="Your name"
+                placeholderTextColor={colors.textMuted}
+                autoCapitalize="words"
+                maxLength={14}
+                autoFocus
+              />
+              <View style={styles.modalButtons}>
+                <Pressable
+                  style={({ pressed }) => [styles.modalButton, pressed && { opacity: 0.7 }]}
+                  onPress={() => setShowNameModal(false)}
+                >
+                  <Text style={styles.modalButtonText}>Cancel</Text>
+                </Pressable>
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.modalButton,
+                    styles.modalButtonPrimary,
+                    pressed && { opacity: 0.9 },
+                    (nameDraft.trim().length === 0 || nameDraft.trim().length > 14) && {
+                      opacity: 0.5,
+                    },
+                  ]}
+                  onPress={saveName}
+                  disabled={nameDraft.trim().length === 0 || nameDraft.trim().length > 14}
+                >
+                  <Text style={[styles.modalButtonText, styles.modalButtonTextPrimary]}>
+                    Save
+                  </Text>
+                </Pressable>
+              </View>
+            </Pressable>
+          </KeyboardAvoidingView>
+        </Pressable>
+      </Modal>
     </SafeAreaView>
   );
 }
