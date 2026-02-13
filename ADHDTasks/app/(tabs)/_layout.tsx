@@ -8,18 +8,19 @@ export default function TabLayout() {
   if (Platform.OS === "ios") {
     return (
       <NativeTabs>
+        <NativeTabs.Trigger name="newTask" role="search">
+          <Label>Add</Label>
+          <Icon sf="plus" />
+        </NativeTabs.Trigger>
         <NativeTabs.Trigger name="home">
-          <Label>Now</Label>
+          <Label>Focusd</Label>
           <Icon sf="bolt.fill" />
         </NativeTabs.Trigger>
         <NativeTabs.Trigger name="toDoList">
           <Label>Tasks</Label>
           <Icon sf="list.bullet" />
         </NativeTabs.Trigger>
-        <NativeTabs.Trigger name="newTask" role="search">
-          <Label>Add</Label>
-          <Icon sf="plus" />
-        </NativeTabs.Trigger>
+
         <NativeTabs.Trigger name="history">
           <Label>History</Label>
           <Icon sf="clock.arrow.circlepath" />
@@ -41,7 +42,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="home"
         options={{
-          title: "Now",
+          title: "Focusd",
           tabBarIcon: ({ color, size }) => (
             <IconSymbol name="bolt.fill" color={color} size={size} />
           ),
