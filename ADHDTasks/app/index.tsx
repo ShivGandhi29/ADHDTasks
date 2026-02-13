@@ -1,11 +1,33 @@
+import { useEffect, useState } from "react";
+import { View } from "react-native";
 import { Redirect } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useTheme } from "./context/ThemeContext";
+
+const USER_NAME_KEY = "@adhdtasks/user_name";
 
 export default function Index() {
-  const isAuthenticated = true; //change this to false once we have authentication
+  const { colors } = useTheme();
+  const [signupDone, setSignupDone] = useState<boolean | null>(null);
 
-  return isAuthenticated ? (
+  useEffect(() => {
+    (async () => {
+      try {
+        const name = await AsyncStorage.getItem(USER_NAME_KEY);
+        setSignupDone(name != null && name.trim().length > 0);
+      } catch {
+        setSignupDone(false);
+      }
+    })();
+  }, []);
+
+  if (signupDone === null) {
+    return <View style={{ flex: 1, backgroundColor: colors.background }} />;
+  }
+
+  return signupDone ? (
     <Redirect href="/(tabs)/home" />
   ) : (
-    <Redirect href="/(auth)/login" />
+    <Redirect href="/signup" />
   );
 }

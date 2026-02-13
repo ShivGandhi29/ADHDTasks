@@ -30,6 +30,7 @@ function RootLayoutContent() {
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        <Stack.Screen name="signup" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style={theme === "dark" ? "light" : "dark"} />
     </NavThemeProvider>

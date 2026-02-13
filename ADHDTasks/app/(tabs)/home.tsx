@@ -1,5 +1,6 @@
-import React, { useCallback, useMemo, useState } from "react";
-import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect, useRouter } from "expo-router";
 import {
   SafeAreaView,
@@ -25,6 +26,7 @@ import { syncWidgetWithTask } from "../utils/widget";
 import { useTheme } from "../context/ThemeContext";
 
 const TAB_BAR_HEIGHT = 56;
+const USER_NAME_KEY = "@adhdtasks/user_name";
 
 export default function HomeScreen() {
   const { colors } = useTheme();
@@ -56,6 +58,19 @@ export default function HomeScreen() {
           fontWeight: "600",
           color: colors.text,
         },
+        testSignupButton: {
+          marginTop: 8,
+          alignSelf: "flex-start",
+          paddingVertical: 6,
+          paddingHorizontal: 12,
+          backgroundColor: colors.borderLight,
+          borderRadius: 8,
+        },
+        testSignupButtonText: {
+          fontSize: 12,
+          color: colors.textMuted,
+          fontWeight: "500",
+        },
       }),
     [colors, contentBottomPadding],
   );
@@ -68,6 +83,18 @@ export default function HomeScreen() {
   const [expandedInactiveId, setExpandedInactiveId] = useState<string | null>(
     null,
   );
+  const [userName, setUserName] = useState<string | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const name = await AsyncStorage.getItem(USER_NAME_KEY);
+        if (name?.trim()) setUserName(name.trim());
+      } catch {
+        // ignore
+      }
+    })();
+  }, []);
 
   const handleInactiveCardPress = useCallback((itemId: string) => {
     setExpandedInactiveId((current) => (current === itemId ? null : itemId));
@@ -91,12 +118,22 @@ export default function HomeScreen() {
     [activeTask],
   );
   const router = useRouter();
+
+  const handleTestSignup = useCallback(async () => {
+    try {
+      await AsyncStorage.removeItem(USER_NAME_KEY);
+      router.replace("/signup" as const);
+    } catch {
+      // ignore
+    }
+  }, [router]);
+
   const greeting = useMemo(() => {
     const hour = new Date().getHours();
-    if (hour < 12) return "Good morning";
-    if (hour < 18) return "Good afternoon";
-    return "Good evening";
-  }, []);
+    let base = "Good morning";
+    if (hour >= 12) base = hour < 18 ? "Good afternoon" : "Good evening";
+    return userName ? `${base}, ${userName}` : base;
+  }, [userName]);
 
   const loadTasks = useCallback(async () => {
     const [tasks, active] = await Promise.all([getTasks(), getActiveTask()]);
@@ -275,6 +312,9 @@ export default function HomeScreen() {
       >
         <View style={styles.header}>
           <Text style={styles.greeting}>{greeting}</Text>
+          <Pressable style={styles.testSignupButton} onPress={handleTestSignup}>
+            <Text style={styles.testSignupButtonText}>Test signup screen</Text>
+          </Pressable>
         </View>
         {activeTask ? (
           <View>
