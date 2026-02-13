@@ -92,6 +92,7 @@ export default function ActiveCard({
 
   const handleManualComplete = () => {
     // No alarm - just stop timer and show completion UI
+    stopTimerAlarm(); // Stop any playing alarm
     setIsRunning(false);
     setIsPaused(false);
     setRemainingSeconds(0);
@@ -112,6 +113,7 @@ export default function ActiveCard({
   };
 
   const handleExtend = (extraMinutes: number) => {
+    stopTimerAlarm(); // Stop the alarm when extending time
     setIsTimesUp(false);
     setIsManuallyCompleted(false);
     setRemainingSeconds(extraMinutes * 60);
@@ -122,6 +124,7 @@ export default function ActiveCard({
   };
 
   const handleAddTime = (extraMinutes: number) => {
+    stopTimerAlarm(); // Stop any playing alarm when adding time
     const extraSeconds = extraMinutes * 60;
     const newRemaining = remainingSeconds + extraSeconds;
     setRemainingSeconds(newRemaining);
@@ -431,7 +434,7 @@ export default function ActiveCard({
               Math.max(2, currentDurationSeconds * 0.3),
               0,
             ]}
-            strokeWidth={10}
+            strokeWidth={20}
             size={300}
             updateInterval={1}
             onUpdate={(remainingTime) => setRemainingSeconds(remainingTime)}
